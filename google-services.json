@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "744714530096",
+    "project_id": "xanhandsach",
+    "storage_bucket": "xanhandsach.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744714530096:android:a9ae6288434eb6f6a1acf5",
+        "android_client_info": {
+          "package_name": "com.trungngo.xanhandsach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYEy2_1toIHeQMhx12RwXGoV42ul6iQuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

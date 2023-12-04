@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">XanhAndSach</string>
+    <string name="google_map_key">AIzaSyA8Ya0vgFvYHnxJWDUIcpwkH2TnRbRORho</string>
+    <string name="authentication_default_error">
+        Authentication failed! Try again.
+    </string>
+</resources>
