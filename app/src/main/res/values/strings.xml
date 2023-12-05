@@ -1,15 +1,26 @@
 <resources>
     <string name="app_name">XanhAndSach</string>
+    <string name="mock_up_title">My application</string>
     <string name="google_map_key">AIzaSyA8Ya0vgFvYHnxJWDUIcpwkH2TnRbRORho</string>
     <string name="authentication_default_error">
         Authentication failed! Try again.
     </string>
+    <string name="register_default_error">
+        Something wrong! Try again.
+    </string>
     <string name="email_prompt">Enter your email please…</string>
     <string name="password_prompt">Enter your password please…</string>
-    <string name="login_text">Login</string>
+    <string name="displayName_prompt">Enter your display name…</string>
+    <string name="login_text">Sign In</string>
+
     <string name="email_text">Email</string>
     <string name="password_text">Password</string>
+    <string name="displayName_text">Display Name</string>
     <string name="sign_in_text">Sign in</string>
     <string name="sign_up_text">Sign up</string>
     <string name="no_account">Don\'t have an account?</string>
+    <string name="have_account">Already have account?</string>
+    <string name="email_error">Wrong email format!</string>
+    <string name="displayName_error">Between 10 and 20 characters!</string>
+    <string name="password_error">Between 7 and 10 characters!</string>
 </resources>

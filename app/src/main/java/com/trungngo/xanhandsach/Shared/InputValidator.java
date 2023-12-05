@@ -8,7 +8,11 @@ public class InputValidator {
     return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
   }
 
-  public static boolean isValidPass(String password) {
-    return password.length() > 7;
+  public static boolean isValidPass(String password, int lowerBound, int upperBound) {
+    return password.length() >= lowerBound && password.length() <= upperBound;
+  }
+
+  public static boolean isValidNumCharacters(String input, int lowerBound, int upperBound) {
+    return input.length() >= lowerBound && input.length() <= upperBound;
   }
 }

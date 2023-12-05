@@ -30,6 +30,28 @@ public class PreferenceManager {
     return gson.fromJson(currentUserJson, UserDto.class);
   }
 
+  public void putCacheUser(User cacheUser) {
+    SharedPreferences.Editor userEditor = sharedPreferences.edit();
+    Gson gson = new Gson();
+    String currentUserJson = gson.toJson(cacheUser);
+    userEditor.putString(Constant.KEY_CACHE_REGISTER, currentUserJson);
+    userEditor.apply();
+  }
+
+  public User getCacheUser() {
+    String currentUserJson = sharedPreferences.getString(Constant.KEY_CACHE_REGISTER, null);
+    Gson gson = new Gson();
+    return gson.fromJson(currentUserJson, User.class);
+  }
+
+  public void clearCacheUser() {
+    SharedPreferences.Editor userEditor = sharedPreferences.edit();
+    Gson gson = new Gson();
+    String currentUserJson = gson.toJson(null);
+    userEditor.putString(Constant.KEY_CACHE_REGISTER, currentUserJson);
+    userEditor.apply();
+  }
+
   public void putBoolean(String key, boolean value) {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putBoolean(key, value);

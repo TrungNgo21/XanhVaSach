@@ -14,4 +14,6 @@ public class UserDto {
   private String email;
   private String fcmToken;
   private String permission;
+  private String image;
+  private String displayName;
 }

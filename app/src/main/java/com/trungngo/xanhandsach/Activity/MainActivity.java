@@ -9,6 +9,7 @@ import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.UserService;
 import com.trungngo.xanhandsach.Shared.Constant;
+import com.trungngo.xanhandsach.Shared.ImageHandler;
 import com.trungngo.xanhandsach.Shared.PreferenceManager;
 import com.trungngo.xanhandsach.databinding.ActivityMainBinding;
 
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     userService = new UserService(this);
     UserDto currentUser = userService.getCurrentUser();
     activityMainBinding.testing.setText(currentUser.getEmail());
+    ImageHandler.setImage(
+        ImageHandler.stringImageToBitMap(currentUser.getImage()), activityMainBinding.testingImg);
     activityMainBinding.testing.setOnClickListener(
         view -> {
           userService.signOut();

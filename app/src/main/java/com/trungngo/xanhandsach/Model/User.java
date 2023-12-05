@@ -16,10 +16,19 @@ public class User {
   private String id;
   private String email;
   private String password;
+  private String image;
+  private String displayName;
   @Builder.Default private String fcmToken = null;
   @Builder.Default private String permission = Constant.KEY_PERMISSION_USER;
 
   public UserDto toDto() {
-    return UserDto.builder().id(id).email(email).fcmToken(fcmToken).permission(permission).build();
+    return UserDto.builder()
+        .id(id)
+        .email(email)
+        .fcmToken(fcmToken)
+        .permission(permission)
+        .image(image)
+        .displayName(displayName)
+        .build();
   }
 }

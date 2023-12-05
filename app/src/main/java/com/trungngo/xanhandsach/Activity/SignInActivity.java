@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Service.UserService;
+import com.trungngo.xanhandsach.Shared.Constant;
 import com.trungngo.xanhandsach.Shared.Error;
 import com.trungngo.xanhandsach.Shared.Result;
 import com.trungngo.xanhandsach.databinding.ActivitySignInBinding;
@@ -38,6 +39,7 @@ public class SignInActivity extends AppCompatActivity {
     setLoading(false);
     setErrorMessage(activitySignInBinding.authenticatedFailedId, false);
     setButtonPressed();
+    setUpToolbar();
     TextWatcher inputListener = setInputListener();
     activitySignInBinding.emailId.addTextChangedListener(inputListener);
     activitySignInBinding.passwordId.addTextChangedListener(inputListener);
@@ -97,6 +99,12 @@ public class SignInActivity extends AppCompatActivity {
         view -> {
           startActivity(new Intent(this, SignUpActivity.class));
         });
+  }
+
+  private void setUpToolbar() {
+    activitySignInBinding.toolbarId.toolbarTitleId.setText(Constant.KEY_SIGN_IN_TITLE);
+    activitySignInBinding.toolbarId.backIcon.setVisibility(View.INVISIBLE);
+    activitySignInBinding.toolbarId.menuIconId.setVisibility(View.INVISIBLE);
   }
 
   private void setEnableFormControl(boolean isEnabled) {

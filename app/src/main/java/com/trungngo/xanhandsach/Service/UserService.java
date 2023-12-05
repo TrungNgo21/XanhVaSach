@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -66,13 +67,18 @@ public class UserService {
         .addOnCompleteListener(
             createUserTask -> {
               if (createUserTask.isSuccessful()) {
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 UserDto createdUser = user.toDto();
+                createdUser.setId(firebaseUser.getUid());
                 userReference
-                    .add(createdUser)
+                    .document(createdUser.getId())
+                    .set(createdUser)
                     .addOnCompleteListener(
                         addUserTask -> {
                           if (addUserTask.isSuccessful()) {
                             Result.Success<UserDto> userDtoRes = new Result.Success<>(createdUser);
+                            preferenceManager.putCurrentUser(createdUser);
+                            preferenceManager.putBoolean(Constant.KEY_SIGN_IN, true);
                             callback.callbackRes(userDtoRes);
                           } else {
                             Result.Error userDtoErr = new Result.Error(addUserTask.getException());
@@ -96,5 +102,23 @@ public class UserService {
 
   public UserDto getCurrentUser() {
     return preferenceManager.getCurrentUser();
+  }
+
+  public void cacheRegister(User cacheUser) {
+    if (cacheUser.getImage() == null
+        && cacheUser.getPassword().isEmpty()
+        && cacheUser.getDisplayName().isEmpty()
+        && cacheUser.getEmail().isEmpty()) {
+      return;
+    }
+    preferenceManager.putCacheUser(cacheUser);
+  }
+
+  public User getCacheRegister() {
+    return preferenceManager.getCacheUser();
+  }
+
+  public void clearRegisterCache() {
+    preferenceManager.clearCacheUser();
   }
 }
