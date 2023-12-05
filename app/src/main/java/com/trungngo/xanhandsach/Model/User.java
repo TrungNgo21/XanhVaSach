@@ -1,5 +1,6 @@
 package com.trungngo.xanhandsach.Model;
 
+import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Shared.Constant;
 
 import lombok.AllArgsConstructor;
@@ -17,4 +18,8 @@ public class User {
   private String password;
   @Builder.Default private String fcmToken = null;
   @Builder.Default private String permission = Constant.KEY_PERMISSION_USER;
+
+  public UserDto toDto() {
+    return UserDto.builder().id(id).email(email).fcmToken(fcmToken).permission(permission).build();
+  }
 }

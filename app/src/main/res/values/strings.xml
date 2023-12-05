@@ -4,4 +4,12 @@
     <string name="authentication_default_error">
         Authentication failed! Try again.
     </string>
+    <string name="email_prompt">Enter your email please…</string>
+    <string name="password_prompt">Enter your password please…</string>
+    <string name="login_text">Login</string>
+    <string name="email_text">Email</string>
+    <string name="password_text">Password</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="sign_up_text">Sign up</string>
+    <string name="no_account">Don\'t have an account?</string>
 </resources>
