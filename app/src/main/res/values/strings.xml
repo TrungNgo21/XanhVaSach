@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">XanhAndSach</string>
     <string name="mock_up_title">My application</string>
-    <string name="google_map_key">AIzaSyA8Ya0vgFvYHnxJWDUIcpwkH2TnRbRORho</string>
+    <string name="google_map_key">AIzaSyBYWCCuABKDmG63wYzb05t_DWK87N9AmWI</string>
     <string name="authentication_default_error">
         Authentication failed! Try again.
     </string>
@@ -23,4 +23,19 @@
     <string name="email_error">Wrong email format!</string>
     <string name="displayName_error">Between 10 and 20 characters!</string>
     <string name="password_error">Between 7 and 10 characters!</string>
+
+    <string name="default_severity">Testing</string>
+    <string name="volunteer_num_title">Volunteers: </string>
+    <string name="created_date_title">Last updated: </string>
+    <string name="author_title">Owner: </string>
+    <string name="add_site_prompt">Add your own site!</string>
+    <string name="add_image_prompt">Add image</string>
+
+    <string-array name="severity_category">
+        <item>Quite Dirty</item>
+        <item>Dirty</item>
+        <item>Extremely Dirty</item>
+    </string-array>
+
+
 </resources>

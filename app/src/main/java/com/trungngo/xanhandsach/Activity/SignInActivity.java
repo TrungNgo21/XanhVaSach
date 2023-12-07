@@ -99,6 +99,10 @@ public class SignInActivity extends AppCompatActivity {
         view -> {
           startActivity(new Intent(this, SignUpActivity.class));
         });
+    activitySignInBinding.clearTemp.setOnClickListener(
+        view -> {
+          userService.signOut();
+        });
   }
 
   private void setUpToolbar() {

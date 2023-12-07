@@ -133,6 +133,20 @@
                 android:background="@drawable/button_primary"
                 android:text="@string/login_text" />
 
+            <Button
+                android:id="@+id/clearTemp"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:textColor="@color/primary_dark"
+                android:layout_below="@+id/passwordContainer"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="@dimen/_38sdp"
+                android:layout_marginEnd="@dimen/_38sdp"
+                android:layout_marginTop="@dimen/_80sdp"
+                android:background="@drawable/button_primary"
+                android:text="temp" />
+
             <LinearLayout
                 android:paddingHorizontal="@dimen/_4sdp"
                 android:background="@color/white"

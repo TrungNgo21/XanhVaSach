@@ -4,16 +4,40 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.User;
 
+import java.lang.reflect.Type;
+
 public class PreferenceManager {
 
-  private final SharedPreferences sharedPreferences;
+  private SharedPreferences sharedPreferences;
 
   public PreferenceManager(Context context) {
     sharedPreferences =
         context.getSharedPreferences(Constant.KEY_SHARED_CONTEXT, Context.MODE_PRIVATE);
+  }
+
+  public final class PreferenceObjectManager<T> extends PreferenceManager {
+    public PreferenceObjectManager(Context context) {
+      super(context);
+    }
+
+    public void putObject(T template, String key) {
+      SharedPreferences.Editor objectEditor = sharedPreferences.edit();
+      Gson gson = new Gson();
+      String objectJson = gson.toJson(template);
+      objectEditor.putString(key, objectJson);
+      objectEditor.apply();
+    }
+
+    public T getObject(String key) {
+      String objectJson = sharedPreferences.getString(key, null);
+      Gson gson = new Gson();
+      Type T = new TypeToken<T>() {}.getType();
+      return gson.fromJson(objectJson, T);
+    }
   }
 
   public void putCurrentUser(UserDto currentUser) {

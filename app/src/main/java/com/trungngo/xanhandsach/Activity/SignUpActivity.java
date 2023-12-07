@@ -35,6 +35,8 @@ import com.trungngo.xanhandsach.Shared.InputValidator;
 import com.trungngo.xanhandsach.Shared.Result;
 import com.trungngo.xanhandsach.databinding.ActivitySignUpBinding;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.List;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -68,8 +70,10 @@ public class SignUpActivity extends AppCompatActivity {
     if (userService.getCacheRegister() != null) {
       User cacheUser = userService.getCacheRegister();
       if (cacheUser.getImage() != null) {
-        Bitmap imageBitmap = ImageHandler.stringImageToBitMap(cacheUser.getImage());
-        ImageHandler.setImage(imageBitmap, activitySignUpBinding.userImgId);
+        if (!cacheUser.getImage().equals(Constant.KEY_DEFAULT_USER_IMG)) {
+          Bitmap imageBitmap = ImageHandler.stringImageToBitMap(cacheUser.getImage());
+          ImageHandler.setImage(imageBitmap, activitySignUpBinding.userImgId);
+        }
       }
       activitySignUpBinding.emailSignUp.setText(cacheUser.getEmail());
       activitySignUpBinding.passwordSignUp.setText(cacheUser.getPassword());
@@ -290,6 +294,10 @@ public class SignUpActivity extends AppCompatActivity {
       cache.setImage(Constant.KEY_DEFAULT_USER_IMG);
     } else {
       if (previousCache.getImage() != null || !previousCache.getImage().isEmpty()) {
+        if (previousCache.getImage().equals(Constant.KEY_DEFAULT_USER_IMG)) {
+          cache.setImage(Constant.KEY_DEFAULT_USER_IMG);
+          return cache;
+        }
         cache.setImage(
             ImageHandler.toBitMapImg(
                 ((BitmapDrawable) activitySignUpBinding.userImgId.getDrawable()).getBitmap(),

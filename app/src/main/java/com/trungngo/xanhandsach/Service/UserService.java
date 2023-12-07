@@ -105,7 +105,8 @@ public class UserService {
   }
 
   public void cacheRegister(User cacheUser) {
-    if (cacheUser.getImage() == null
+    if ((cacheUser.getImage().isEmpty()
+            || cacheUser.getImage().equals(Constant.KEY_DEFAULT_USER_IMG))
         && cacheUser.getPassword().isEmpty()
         && cacheUser.getDisplayName().isEmpty()
         && cacheUser.getEmail().isEmpty()) {

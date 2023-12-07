@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     setContentView(activityMainBinding.getRoot());
     userService = new UserService(this);
     UserDto currentUser = userService.getCurrentUser();
+    //    userService.signOut();
     activityMainBinding.testing.setText(currentUser.getEmail());
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(currentUser.getImage()), activityMainBinding.testingImg);

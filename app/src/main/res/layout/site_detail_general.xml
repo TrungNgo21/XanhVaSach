@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_2sdp"
+    android:gravity="center_vertical"
+    android:background="@drawable/default_border">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/siteImgId"
+        android:layout_width="@dimen/_65sdp"
+        android:layout_height="@dimen/_65sdp"
+        android:src="@drawable/bg_main"
+        android:scaleType="centerCrop"
+        app:riv_corner_radius="@dimen/_99sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/_2sdp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/siteNameId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GeneralCardHeading"
+            android:text="Rubbish Rmit University" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:src="@drawable/location_icon" />
+
+            <TextView
+                android:id="@+id/siteAddressId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoItalic"
+                android:text="702 Nguyen Van Linh" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:layout_width="@dimen/_10sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:src="@drawable/volunteers" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormalHeading"
+                    android:text="@string/volunteer_num_title" />
+
+                <TextView
+                    android:id="@+id/signUpNumId"
+                    android:layout_marginStart="@dimen/_1sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormal"
+                    android:text="4" />
+
+                <TextView
+                    android:layout_marginStart="@dimen/_1sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormal"
+                    android:text="/" />
+
+                <TextView
+                    android:id="@+id/maximumCapacityId"
+                    android:layout_marginStart="@dimen/_1sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormal"
+                    android:text="5" />
+            </LinearLayout>
+
+            <include
+                layout="@layout/severity_chip"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_60sdp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_1sdp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2">
+
+                <ImageView
+                    android:layout_width="@dimen/_10sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:src="@drawable/date_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormalHeading"
+                    android:text="@string/created_date_title" />
+
+                <TextView
+                    android:id="@+id/createdDateId"
+                    android:layout_marginStart="@dimen/_1sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormal"
+                    android:text="20/22/2023" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="@dimen/_10sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/owner_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormalHeading"
+                    android:text="@string/author_title" />
+
+                <TextView
+                    android:id="@+id/ownerId"
+                    android:layout_marginStart="@dimen/_1sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralInfoNormal"
+                    android:text="ngolambaotrrung@gmail.com" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
