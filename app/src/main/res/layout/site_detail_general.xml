@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/_2sdp"
+    android:layout_marginVertical="@dimen/_4sdp"
+    android:layout_marginHorizontal="@dimen/_2sdp"
     android:gravity="center_vertical"
     android:background="@drawable/default_border">
 
@@ -21,7 +23,7 @@
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:layout_marginStart="@dimen/_2sdp"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/siteNameId"
@@ -95,9 +97,10 @@
             </LinearLayout>
 
             <include
+                android:id="@+id/severityChip"
                 layout="@layout/severity_chip"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_width="@dimen/_60sdp" />
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
@@ -107,56 +110,57 @@
             android:layout_marginTop="@dimen/_1sdp"
             android:gravity="center_vertical">
 
-            <LinearLayout
+
+            <ImageView
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:src="@drawable/date_icon" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2">
+                style="@style/GeneralInfoNormalHeading"
+                android:text="@string/created_date_title" />
 
-                <ImageView
-                    android:layout_width="@dimen/_10sdp"
-                    android:layout_height="@dimen/_10sdp"
-                    android:src="@drawable/date_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralInfoNormalHeading"
-                    android:text="@string/created_date_title" />
-
-                <TextView
-                    android:id="@+id/createdDateId"
-                    android:layout_marginStart="@dimen/_1sdp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralInfoNormal"
-                    android:text="20/22/2023" />
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/createdDateId"
+                android:layout_marginStart="@dimen/_1sdp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoNormal"
+                android:text="20/22/2023" />
 
-                <ImageView
-                    android:layout_width="@dimen/_10sdp"
-                    android:layout_height="@dimen/_10sdp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/owner_icon" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralInfoNormalHeading"
-                    android:text="@string/author_title" />
-
-                <TextView
-                    android:id="@+id/ownerId"
-                    android:layout_marginStart="@dimen/_1sdp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralInfoNormal"
-                    android:text="ngolambaotrrung@gmail.com" />
-            </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_gravity="center"
+                android:src="@drawable/owner_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoNormalHeading"
+                android:text="@string/author_title" />
+
+            <TextView
+                android:id="@+id/ownerId"
+                android:layout_marginStart="@dimen/_1sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoNormal"
+                android:text="ngolambaotrrung@gmail.com" />
+        </LinearLayout>
+
 
     </LinearLayout>
 

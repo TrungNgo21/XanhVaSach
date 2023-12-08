@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/_60sdp"
-    android:layout_height="@dimen/_24sdp"
+    android:layout_width="wrap_content"
+    android:paddingHorizontal="@dimen/_10sdp"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/_4sdp"
     android:gravity="center"
     android:background="@drawable/warning_chip">
 
     <TextView
+        android:id="@+id/severityNameId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/default_severity"

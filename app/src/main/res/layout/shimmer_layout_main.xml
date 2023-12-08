@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_2sdp"
+    android:layout_marginVertical="@dimen/_4sdp"
+    android:layout_marginHorizontal="@dimen/_2sdp"
+    android:gravity="center_vertical">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/siteImgId"
+        android:layout_width="@dimen/_55sdp"
+        android:layout_height="@dimen/_55sdp"
+        android:src="@color/shimmer"
+        android:scaleType="centerCrop"
+        app:riv_corner_radius="@dimen/_99sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/_2sdp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/siteNameId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextShimmer"
+            android:text="Rubbish Rmit University" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:layout_marginTop="@dimen/_3sdp"
+                android:id="@+id/siteAddressId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextShimmer1"
+                android:text="702 Nguyen Van Linh" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:gravity="center_vertical">
+
+
+            <TextView
+                android:id="@+id/ownerId"
+                android:layout_marginStart="@dimen/_1sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextShimmer2"
+                android:text="ngolambaotrrung@gmail.com" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

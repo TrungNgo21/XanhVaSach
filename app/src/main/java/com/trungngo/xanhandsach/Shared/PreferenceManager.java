@@ -19,26 +19,26 @@ public class PreferenceManager {
         context.getSharedPreferences(Constant.KEY_SHARED_CONTEXT, Context.MODE_PRIVATE);
   }
 
-  public final class PreferenceObjectManager<T> extends PreferenceManager {
-    public PreferenceObjectManager(Context context) {
-      super(context);
-    }
-
-    public void putObject(T template, String key) {
-      SharedPreferences.Editor objectEditor = sharedPreferences.edit();
-      Gson gson = new Gson();
-      String objectJson = gson.toJson(template);
-      objectEditor.putString(key, objectJson);
-      objectEditor.apply();
-    }
-
-    public T getObject(String key) {
-      String objectJson = sharedPreferences.getString(key, null);
-      Gson gson = new Gson();
-      Type T = new TypeToken<T>() {}.getType();
-      return gson.fromJson(objectJson, T);
-    }
-  }
+  //  public final class PreferenceObjectManager<T> extends PreferenceManager {
+  //    public PreferenceObjectManager(Context context) {
+  //      super(context);
+  //    }
+  //
+  //    public void putObject(T template, String key) {
+  //      SharedPreferences.Editor objectEditor = sharedPreferences.edit();
+  //      Gson gson = new Gson();
+  //      String objectJson = gson.toJson(template);
+  //      objectEditor.putString(key, objectJson);
+  //      objectEditor.apply();
+  //    }
+  //
+  //    public T getObject(String key) {
+  //      String objectJson = sharedPreferences.getString(key, null);
+  //      Gson gson = new Gson();
+  //      Type T = new TypeToken<T>() {}.getType();
+  //      return gson.fromJson(objectJson, T);
+  //    }
+  //  }
 
   public void putCurrentUser(UserDto currentUser) {
     SharedPreferences.Editor userEditor = sharedPreferences.edit();

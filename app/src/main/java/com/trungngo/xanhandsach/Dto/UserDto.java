@@ -16,4 +16,7 @@ public class UserDto {
   private String permission;
   private String image;
   private String displayName;
+  private double latitude;
+  private double longitude;
+  private String currentAddress;
 }

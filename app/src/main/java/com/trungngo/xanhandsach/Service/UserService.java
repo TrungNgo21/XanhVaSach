@@ -104,6 +104,10 @@ public class UserService {
     return preferenceManager.getCurrentUser();
   }
 
+  public void setCurrentUser(UserDto currentUser) {
+    preferenceManager.putCurrentUser(currentUser);
+  }
+
   public void cacheRegister(User cacheUser) {
     if ((cacheUser.getImage().isEmpty()
             || cacheUser.getImage().equals(Constant.KEY_DEFAULT_USER_IMG))

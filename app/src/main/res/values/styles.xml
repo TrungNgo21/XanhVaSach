@@ -13,6 +13,34 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TabText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textSize">@dimen/_12ssp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextShimmer" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/shimmer</item>
+        <item name="android:textSize">@dimen/_14ssp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@color/shimmer</item>
+    </style>
+
+    <style name="TextShimmer1" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/shimmer</item>
+        <item name="android:textSize">@dimen/_12ssp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@color/shimmer</item>
+    </style>
+
+    <style name="TextShimmer2" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/shimmer</item>
+        <item name="android:textSize">@dimen/_10ssp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@color/shimmer</item>
+    </style>
+
+
     <style name="GeneralCardHeading1" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/primary_dark</item>
         <item name="android:textSize">@dimen/_16ssp</item>
@@ -32,6 +60,12 @@
         <item name="android:textStyle">italic</item>
     </style>
 
+    <style name="GeneralInfoItalic1" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textSize">@dimen/_10ssp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
     <style name="GeneralInfoNormalHeading" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/grey</item>
         <item name="android:textSize">@dimen/_8ssp</item>
@@ -41,6 +75,11 @@
     <style name="GeneralInfoNormal" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/grey</item>
         <item name="android:textSize">@dimen/_8ssp</item>
+    </style>
+
+    <style name="GeneralInfoNormal1" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textSize">@dimen/_10ssp</item>
     </style>
 
     <style name="InputInfoNormal" parent="TextAppearance.AppCompat">
@@ -53,5 +92,6 @@
         <item name="android:textColor">@color/error</item>
         <item name="android:textSize">@dimen/_10ssp</item>
         <item name="android:textStyle">italic</item>
+        <item name="android:layout_marginStart">@dimen/_4sdp</item>
     </style>
 </resources>

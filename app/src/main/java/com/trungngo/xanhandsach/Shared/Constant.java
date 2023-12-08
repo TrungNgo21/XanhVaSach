@@ -24,6 +24,8 @@ public class Constant {
   public static final String KEY_SIGN_IN_TITLE = "Sign In";
   public static final String KEY_SIGN_UP_TITLE = "Sign Up";
 
+  public static final String KEY_SITE_ID = "siteId";
+
   public static final String KEY_NOT_ALLOWED_MORE_THAN_8 =
       "You are not allow to pick more than 8 images!";
 }

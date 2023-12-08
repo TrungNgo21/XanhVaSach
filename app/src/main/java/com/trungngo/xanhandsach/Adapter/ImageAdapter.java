@@ -19,10 +19,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
   private Context context;
   private List<Uri> imageUris;
   private OnItemCountAfterDelete onItemCountAfterDelete;
+  private OnItemZoom onItemZoom;
 
-  public ImageAdapter(Context context, OnItemCountAfterDelete onItemCountAfterDelete) {
+  public ImageAdapter(
+      Context context, OnItemCountAfterDelete onItemCountAfterDelete, OnItemZoom onItemZoom) {
     this.context = context;
     this.onItemCountAfterDelete = onItemCountAfterDelete;
+    this.onItemZoom = onItemZoom;
   }
 
   public void setData(List<Uri> uriList) {
@@ -35,7 +38,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
   public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     View view =
         LayoutInflater.from(parent.getContext()).inflate(R.layout.added_image, parent, false);
-    return new ImageViewHolder(view, onItemCountAfterDelete);
+    return new ImageViewHolder(view, onItemCountAfterDelete, onItemZoom);
   }
 
   @Override
@@ -59,21 +62,40 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     return 0;
   }
 
-  public static class ImageViewHolder extends RecyclerView.ViewHolder {
+  public static class ImageViewHolder extends RecyclerView.ViewHolder
+      implements View.OnClickListener {
     private final ImageView imageView;
     private final ImageView deleteIcon;
 
     private OnItemCountAfterDelete onItemCountAfterDelete;
 
-    public ImageViewHolder(@NonNull View itemView, OnItemCountAfterDelete onItemCountAfterDelete) {
+    private OnItemZoom onItemZoom;
+
+    public ImageViewHolder(
+        @NonNull View itemView,
+        OnItemCountAfterDelete onItemCountAfterDelete,
+        OnItemZoom onItemZoom) {
       super(itemView);
       this.onItemCountAfterDelete = onItemCountAfterDelete;
+      this.onItemZoom = onItemZoom;
       imageView = itemView.findViewById(R.id.addedImageId);
       deleteIcon = itemView.findViewById(R.id.deleteImageIcon);
+      itemView.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+      if (onItemZoom != null) {
+        onItemZoom.itemZoomClick(getAdapterPosition());
+      }
     }
   }
 
   public interface OnItemCountAfterDelete {
     void clickDelete(int leftNum);
+  }
+
+  public interface OnItemZoom {
+    void itemZoomClick(int position);
   }
 }

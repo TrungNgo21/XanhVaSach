@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_16sdp">
+        android:layout_marginTop="@dimen/_30sdp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -72,12 +72,30 @@
                         android:text="0/8" />
                 </LinearLayout>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/imagesSelectedId"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_140sdp"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="4" />
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/noImageSelected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_140sdp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/no_image" />
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/imagesSelectedId"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_140sdp"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="4" />
+                </RelativeLayout>
+
 
                 <LinearLayout
                     android:layout_marginTop="@dimen/_2sdp"
@@ -99,6 +117,7 @@
 
                         <TextView
                             android:id="@+id/siteNameErr"
+                            android:text="Between 6 and 15 characters"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             style="@style/ErrorText" />
@@ -106,6 +125,7 @@
 
 
                     <EditText
+                        android:id="@+id/siteName"
                         style="@style/InputInfoNormal"
                         android:layout_width="@dimen/_200sdp"
                         android:layout_height="@dimen/_30sdp"
@@ -139,6 +159,7 @@
 
                             <TextView
                                 android:id="@+id/maxVolunErr"
+                                android:text="From 0 to 20"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 style="@style/ErrorText" />
@@ -146,6 +167,7 @@
 
 
                         <EditText
+                            android:id="@+id/volunNumId"
                             android:hint="Maximum volunteers number..."
                             style="@style/InputInfoNormal"
                             android:inputType="number"
@@ -224,17 +246,14 @@
                             style="@style/GeneralCardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Dish's Description" />
+                            android:text="Site's Description" />
 
                         <TextView
+                            android:text="Between 12 and 20 characters"
                             android:id="@+id/siteDesErr"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="bottom"
-                            style="@style/ErrorText"
-                            android:layout_marginStart="4dp"
-                            android:layout_gravity="start"
-                            android:textColor="@color/error" />
+                            android:layout_height="wrap_content"
+                            style="@style/ErrorText" />
                     </LinearLayout>
 
                     <EditText
@@ -261,6 +280,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:id="@+id/autoCompleteContainer"
                         android:background="@drawable/input_field">
 
                         <fragment
@@ -284,6 +304,7 @@
                         <TextView
                             android:id="@+id/addressDisplayErr"
                             android:layout_width="200dp"
+                            android:text="Required!!!"
                             android:layout_height="match_parent"
                             style="@style/ErrorText" />
                     </RelativeLayout>
@@ -309,6 +330,25 @@
             </LinearLayout>
         </ScrollView>
 
+
     </LinearLayout>
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/progressBarHolder"
+        android:animateLayoutChanges="true"
+        android:alpha="0.4"
+        android:background="#000000"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+
+</RelativeLayout>

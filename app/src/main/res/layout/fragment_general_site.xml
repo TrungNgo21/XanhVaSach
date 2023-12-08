@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Fragment.GeneralSiteFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listSite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/shimmerView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_60sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_120sdp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_180sdp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_240sdp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_300sdp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_360sdp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_420sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/shimmer_layout_main" />
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+</RelativeLayout>

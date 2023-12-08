@@ -25,6 +25,7 @@ public class Site {
   private String severity;
   private Double latitude;
   private Double longitude;
+  private String address;
   private String description;
   @Builder.Default private List<String> imageUrl = new ArrayList<>();
   @Builder.Default private List<UserDto> volunteers = new ArrayList<>();
@@ -40,6 +41,7 @@ public class Site {
         .volunteers(volunteers)
         .severity(severity)
         .maxCapacity(maxCapacity)
+        .address(address)
         .createdDate(DateFormatter.toDateString(createdDate))
         .updatedDate(DateFormatter.toDateString(createdDate))
         .imageUrl(imageUrl)

@@ -1,5 +1,10 @@
 package com.trungngo.xanhandsach.Dto;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,4 +31,5 @@ public class SiteDto {
   private List<UserDto> volunteers;
   private String createdDate;
   private String updatedDate;
+  private String address;
 }
