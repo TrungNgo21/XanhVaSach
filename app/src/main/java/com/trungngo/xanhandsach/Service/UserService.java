@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.trungngo.xanhandsach.Activity.MainActivity;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
+import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.User;
 import com.trungngo.xanhandsach.Shared.Constant;
@@ -125,5 +126,19 @@ public class UserService {
 
   public void clearRegisterCache() {
     preferenceManager.clearCacheUser();
+  }
+
+  public void updateUserSiteId(String siteId, final FirebaseCallback<Result<UserDto>> callback) {
+    userReference
+        .document(getCurrentUser().getId())
+        .update("siteId", siteId)
+        .addOnCompleteListener(
+            updateTask -> {
+              if (updateTask.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(getCurrentUser()));
+              } else {
+                callback.callbackRes(new Result.Error(updateTask.getException()));
+              }
+            });
   }
 }

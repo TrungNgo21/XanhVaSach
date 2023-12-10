@@ -10,7 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="info">#068FFF</color>
     <color name="error">#F05941</color>
-    <color name="error_light">#FA9884</color>
+    <color name="error_light">#f9bfbf</color>
     <color name="warning">#FFCD3C</color>
     <color name="warning_dark">#E7B10A</color>
     <color name="warning_light">#FFF6E0</color>

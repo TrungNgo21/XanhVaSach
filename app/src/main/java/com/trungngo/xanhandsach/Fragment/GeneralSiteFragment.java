@@ -12,10 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.trungngo.xanhandsach.Activity.MainActivity;
 import com.trungngo.xanhandsach.Activity.SiteDetailActivity;
 import com.trungngo.xanhandsach.Adapter.SiteAdapter;
-import com.trungngo.xanhandsach.Adapter.TabAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;

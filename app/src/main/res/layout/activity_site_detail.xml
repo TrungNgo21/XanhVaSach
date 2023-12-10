@@ -1,262 +1,278 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.SiteDetailActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <include
-        android:id="@+id/toolbarId"
-        layout="@layout/toolbar"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_width="match_parent" />
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:headerLayout="@layout/header_drawer"
+        android:layout_gravity="start"
+        app:menu="@menu/main_menu" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:paddingHorizontal="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_30sdp"
+    <RelativeLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/toolbarId"
+            layout="@layout/toolbar"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_width="match_parent" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/welcomePrompt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/GeneralCardHeading1"
-                android:text="Welcome to " />
-
-            <TextView
-                android:id="@+id/siteName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/GeneralCardHeading1"
-                android:text="RMIT University" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/GeneralCardHeading2"
-                android:text="Please help " />
-
-            <TextView
-                android:id="@+id/siteOwner"
-                android:layout_width="wrap_content"
-                android:text="Trung Ngo "
-                style="@style/GeneralCardHeading2"
-
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/GeneralCardHeading2"
-                android:text="clean up the site!!!" />
-        </LinearLayout>
-
-        <ScrollView
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/_2sdp"
+            android:layout_marginTop="@dimen/_30sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/welcomePrompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralCardHeading1"
+                    android:text="Welcome to " />
+
+                <TextView
+                    android:id="@+id/siteName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralCardHeading1"
+                    android:text="RMIT University" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralCardHeading2"
+                    android:text="Please help " />
+
+                <TextView
+                    android:id="@+id/siteOwner"
+                    android:layout_width="wrap_content"
+                    android:text="Trung Ngo "
+                    style="@style/GeneralCardHeading2"
+
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralCardHeading2"
+                    android:text="clean up the site!!!" />
+            </LinearLayout>
+
+            <ScrollView
                 android:layout_width="match_parent"
-                android:orientation="vertical"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:layout_marginTop="@dimen/_4sdp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/imageSlider"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_170sdp" />
-
-                    <me.relex.circleindicator.CircleIndicator3
-                        android:id="@+id/sliderIndicator"
-                        app:ci_drawable="@drawable/slider_indicator"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_height="@dimen/_10sdp" />
-                </LinearLayout>
-
-                <include
-                    android:id="@+id/severityChip"
-                    android:layout_gravity="end"
-                    layout="@layout/severity_chip"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content" />
-
-                <LinearLayout
-                    android:layout_marginTop="@dimen/_3sdp"
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
                     android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/_4sdp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        app:tint="@color/primary_dark"
+                        android:orientation="vertical">
 
-                        android:src="@drawable/location_icon" />
+                        <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/imageSlider"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_170sdp" />
 
-                    <TextView
-                        android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        style="@style/GeneralInfoNormal1"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary_dark"
-                        android:text="Address: " />
+                        <me.relex.circleindicator.CircleIndicator3
+                            android:id="@+id/sliderIndicator"
+                            app:ci_drawable="@drawable/slider_indicator"
+                            android:layout_width="match_parent"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_height="@dimen/_10sdp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/siteAddress"
-                        android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
+                    <include
+                        android:id="@+id/severityChip"
+                        android:layout_gravity="end"
+                        layout="@layout/severity_chip"
                         android:layout_height="wrap_content"
-                        style="@style/GeneralInfoNormal1"
-                        android:textColor="@color/primary_dark"
-                        android:text="702 Nguyen Van link" />
-                </LinearLayout>
+                        android:layout_width="wrap_content" />
 
-
-                <LinearLayout
-                    android:layout_marginTop="@dimen/_3sdp"
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        app:tint="@color/primary_dark"
-                        android:src="@drawable/date_icon" />
-
-                    <TextView
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/_3sdp"
                         android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        style="@style/GeneralInfoNormal1"
-                        android:textStyle="bold"
-                        android:text="Created date: " />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/createdDate"
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="centerCrop"
+                            app:tint="@color/primary_dark"
+
+                            android:src="@drawable/location_icon" />
+
+                        <TextView
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            style="@style/GeneralInfoNormal1"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_dark"
+                            android:text="Address: " />
+
+                        <TextView
+                            android:id="@+id/siteAddress"
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/GeneralInfoNormal1"
+                            android:textColor="@color/primary_dark"
+                            android:text="702 Nguyen Van link" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/_3sdp"
                         android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/GeneralInfoNormal1"
-                        android:text="22/10/2022" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="centerCrop"
+                            app:tint="@color/primary_dark"
+                            android:src="@drawable/date_icon" />
 
-                <LinearLayout
-                    android:layout_marginTop="@dimen/_3sdp"
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                        <TextView
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            style="@style/GeneralInfoNormal1"
+                            android:textStyle="bold"
+                            android:text="Created date: " />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:tint="@color/primary_dark"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/owner_icon" />
+                        <TextView
+                            android:id="@+id/createdDate"
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/GeneralInfoNormal1"
+                            android:text="22/10/2022" />
 
-                    <TextView
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/_3sdp"
                         android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        style="@style/GeneralInfoNormal1"
-                        android:textStyle="bold"
-                        android:text="Owner: " />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:tint="@color/primary_dark"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/owner_icon" />
+
+                        <TextView
+                            android:gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            style="@style/GeneralInfoNormal1"
+                            android:textStyle="bold"
+                            android:text="Owner: " />
+
+                        <TextView
+                            android:id="@+id/siteOwnerEmail"
+                            android:gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/GeneralInfoNormal1"
+                            android:text="ngolambaotrung@gmail.com" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/description" />
+
+                        <TextView
+                            android:gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            style="@style/GeneralInfoNormal1"
+                            android:textStyle="bold"
+                            android:text="Description:" />
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/siteOwnerEmail"
+                        android:id="@+id/siteDes"
                         android:gravity="center_vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/GeneralInfoNormal1"
-                        android:text="ngolambaotrung@gmail.com" />
-                </LinearLayout>
+                        android:text="Please help Kien clean his fucking house..." />
 
-                <LinearLayout
-                    android:layout_marginTop="@dimen/_3sdp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/description" />
-
-                    <TextView
-                        android:gravity="center_vertical"
+                    <ViewStub
+                        android:id="@+id/stub_map"
+                        android:inflatedId="@+id/panel_map"
+                        android:layout="@layout/confirmation_map"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        style="@style/GeneralInfoNormal1"
-                        android:textStyle="bold"
-                        android:text="Description:" />
+                        android:layout_height="200dp"
+                        android:layout_gravity="bottom" />
 
-                </LinearLayout>
+                    <FrameLayout
+                        android:id="@+id/progressBarHolder"
+                        android:animateLayoutChanges="true"
+                        android:background="#ffffff"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_200sdp">
 
-                <TextView
-                    android:id="@+id/siteDes"
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralInfoNormal1"
-                    android:text="Please help Kien clean his fucking house..." />
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:layout_gravity="center" />
+                    </FrameLayout>
 
-                <ViewStub
-                    android:id="@+id/stub_map"
-                    android:inflatedId="@+id/panel_map"
-                    android:layout="@layout/confirmation_map"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_gravity="bottom" />
-
-                <FrameLayout
-                    android:id="@+id/progressBarHolder"
-                    android:animateLayoutChanges="true"
-                    android:background="#ffffff"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/_200sdp">
-
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleLarge"
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/submitButton"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:indeterminate="true"
-                        android:layout_gravity="center" />
-                </FrameLayout>
+                        android:backgroundTint="@color/info"
+                        android:textStyle="bold"
+                        android:text="Apply" />
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
 
-                <Button
-                    android:id="@+id/submitButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/info"
-                    android:textStyle="bold"
-                    android:text="Apply" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
+    </RelativeLayout>
 
-</RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

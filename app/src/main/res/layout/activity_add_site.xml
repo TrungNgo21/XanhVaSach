@@ -1,354 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Activity.AddSiteActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <include
-        android:id="@+id/toolbarId"
-        layout="@layout/toolbar"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_width="match_parent" />
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:headerLayout="@layout/header_drawer"
+        android:layout_gravity="start"
+        app:menu="@menu/main_menu" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_30sdp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_site_prompt"
-            style="@style/GeneralCardHeading1" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_4sdp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/GeneralCardHeading2"
-                    android:text="Add your site images" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="@dimen/_2sdp"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="@dimen/_30sdp"
-                        android:src="@drawable/image_icon" />
-
-                    <Button
-                        android:id="@+id/addImageButtonId"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_35sdp"
-                        android:text="@string/add_image_prompt"
-                        android:textSize="@dimen/_10sdp"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary_dark" />
-
-                    <TextView
-                        android:id="@+id/imageNumberId"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/primary_dark"
-                        android:text="0/8" />
-                </LinearLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:id="@+id/noImageSelected"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/_140sdp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/no_image" />
-                    </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/imagesSelectedId"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/_140sdp"
-                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                        app:spanCount="4" />
-                </RelativeLayout>
-
-
-                <LinearLayout
-                    android:layout_marginTop="@dimen/_2sdp"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="@dimen/_2sdp"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="@style/GeneralCardHeading2"
-                            android:text="Site's name" />
-
-                        <TextView
-                            android:id="@+id/siteNameErr"
-                            android:text="Between 6 and 15 characters"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="@style/ErrorText" />
-                    </LinearLayout>
-
-
-                    <EditText
-                        android:id="@+id/siteName"
-                        style="@style/InputInfoNormal"
-                        android:layout_width="@dimen/_200sdp"
-                        android:layout_height="@dimen/_30sdp"
-                        android:background="@drawable/input_field"
-                        android:hint="Your site's name..." />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_2sdp"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false">
-
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                style="@style/GeneralCardHeading2"
-                                android:text="Max volunteers" />
-
-                            <TextView
-                                android:id="@+id/maxVolunErr"
-                                android:text="From 0 to 20"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                style="@style/ErrorText" />
-                        </LinearLayout>
-
-
-                        <EditText
-                            android:id="@+id/volunNumId"
-                            android:hint="Maximum volunteers number..."
-                            style="@style/InputInfoNormal"
-                            android:inputType="number"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/_30sdp"
-                            android:background="@drawable/input_field" />
-                    </LinearLayout>
-
-                    <LinearLayout
-
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:id="@+id/categoryLabel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Severity"
-                                style="@style/GeneralCardHeading2" />
-
-                            <TextView
-                                android:id="@+id/severityErr"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                style="@style/ErrorText" />
-
-                        </LinearLayout>
-
-
-                        <RelativeLayout
-                            android:layout_width="@dimen/_120sdp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="@dimen/_4sdp"
-                            android:background="@drawable/input_field">
-
-                            <Spinner
-                                android:id="@+id/severityCate"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="@dimen/_5sdp"
-                                android:background="@android:color/transparent"
-                                android:gravity="center"
-                                android:spinnerMode="dropdown" />
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:layout_gravity="center"
-                                android:src="@drawable/drop" />
-                        </RelativeLayout>
-
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_2sdp"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            style="@style/GeneralCardHeading2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Site's Description" />
-
-                        <TextView
-                            android:text="Between 12 and 20 characters"
-                            android:id="@+id/siteDesErr"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="@style/ErrorText" />
-                    </LinearLayout>
-
-                    <EditText
-                        android:id="@+id/description"
-                        android:layout_width="300dp"
-                        android:layout_height="100dp"
-                        android:background="@drawable/input_field"
-                        style="@style/InputInfoNormal"
-                        android:hint="Enter a description..." />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Site Address"
-                        style="@style/GeneralCardHeading2" />
-
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/autoCompleteContainer"
-                        android:background="@drawable/input_field">
-
-                        <fragment
-                            android:id="@+id/autoCompleteAddress"
-                            android:layout_width="300dp"
-                            android:layout_height="40dp"
-                            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="bottom">
-
-                        <TextView
-                            android:id="@+id/addressDisplay"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="@style/GeneralTextAppearance" />
-
-                        <TextView
-                            android:id="@+id/addressDisplayErr"
-                            android:layout_width="200dp"
-                            android:text="Required!!!"
-                            android:layout_height="match_parent"
-                            style="@style/ErrorText" />
-                    </RelativeLayout>
-
-
-                </LinearLayout>
-
-                <ViewStub
-                    android:id="@+id/stub_map"
-                    android:inflatedId="@+id/panel_map"
-                    android:layout="@layout/confirmation_map"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_gravity="bottom" />
-
-                <Button
-                    android:id="@+id/createSiteButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Create SITE"
-                    android:textColor="@color/primary_dark"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </ScrollView>
-
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/progressBarHolder"
-        android:animateLayoutChanges="true"
-        android:alpha="0.4"
-        android:background="#000000"
-        android:visibility="invisible"
-        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
+        <include
+            android:id="@+id/toolbarId"
+            layout="@layout/toolbar"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_width="match_parent" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:layout_gravity="center" />
-    </FrameLayout>
+            app:tabIndicatorColor="@color/primary_dark"
+            app:tabRippleColor="@color/primary_200"
+            app:tabTextAppearance="@style/TabText"
+            app:tabSelectedTextColor="@color/primary_dark">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Create Site" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Create Report" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="View Reports" />
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/pageContent" />
+    </LinearLayout>
 
 
-</RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

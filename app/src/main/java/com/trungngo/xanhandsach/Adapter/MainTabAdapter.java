@@ -8,9 +8,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.trungngo.xanhandsach.Fragment.GeneralSiteFragment;
 import com.trungngo.xanhandsach.Fragment.MapSiteFragment;
 
-public class TabAdapter extends FragmentStateAdapter {
+public class MainTabAdapter extends FragmentStateAdapter {
 
-  public TabAdapter(@NonNull FragmentActivity fragmentActivity) {
+  public MainTabAdapter(@NonNull FragmentActivity fragmentActivity) {
     super(fragmentActivity);
   }
 

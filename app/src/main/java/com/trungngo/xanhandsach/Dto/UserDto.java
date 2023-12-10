@@ -19,4 +19,5 @@ public class UserDto {
   private double latitude;
   private double longitude;
   private String currentAddress;
+  private String siteId;
 }

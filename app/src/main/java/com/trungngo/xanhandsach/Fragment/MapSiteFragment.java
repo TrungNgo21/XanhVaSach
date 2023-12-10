@@ -44,14 +44,23 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
 import com.trungngo.xanhandsach.Activity.SiteDetailActivity;
 import com.trungngo.xanhandsach.Adapter.SliderAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.CustomMarker;
+import com.trungngo.xanhandsach.Model.PolylineInfo;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
@@ -66,7 +75,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
+public class MapSiteFragment extends Fragment
+    implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
 
   private FragmentMapSiteBinding fragmentMapSiteBinding;
 
@@ -86,29 +96,24 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
 
   private List<CustomMarker> customMarkers = new ArrayList<>();
 
+  private List<Marker> locationMakers = new ArrayList<>();
+
   private List<SiteDto> sites = new ArrayList<>();
 
   private boolean isAllowedAccessLocation;
+  private GeoApiContext mGeoApiContext;
 
+  private Marker selectedMarker = null;
+
+  private List<PolylineInfo> polylineInfoList = new ArrayList<>();
   private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
   private static final int LOCATION_INTERVAL = 100;
 
   private static final int LOCATION_FASTEST_INTERVAL = 3000;
   private static final int LOCATION_MAX_WAIT_TIME = 100;
 
-  private final Handler handler = new Handler(Looper.getMainLooper());
-  private final Runnable runnable =
-      new Runnable() {
-        @Override
-        public void run() {
-          int position = fragmentMapSiteBinding.imageSlider.getCurrentItem();
-          if (position == sites.size() - 1) {
-            fragmentMapSiteBinding.imageSlider.setCurrentItem(0);
-          } else {
-            fragmentMapSiteBinding.imageSlider.setCurrentItem(position + 1);
-          }
-        }
-      };
+  private Handler handler;
+  private Runnable runnable;
 
   @Override
   public View onCreateView(
@@ -127,6 +132,7 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
     siteService = new SiteService(requireContext());
     userService = new UserService(requireContext());
     currentUser = userService.getCurrentUser();
+    //    getLastLocation();
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
     siteService.getAllSite(
         currentUser.getId(),
@@ -183,14 +189,18 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
   public void onResume() {
     super.onResume();
     getLastLocation();
-    handler.postDelayed(runnable, 3000);
+    if (handler != null) {
+      handler.postDelayed(runnable, 3000);
+    }
   }
 
   @Override
   public void onStop() {
     super.onStop();
     stopLocationUpdates();
-    handler.removeCallbacks(runnable);
+    if (handler != null) {
+      handler.removeCallbacks(runnable);
+    }
   }
 
   private boolean isGPSAllowed() {
@@ -342,6 +352,8 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
               setViewSiteInfo(false);
 
             } else {
+
+              calculateDirections(item);
               fragmentMapSiteBinding.siteName.setText(item.getSite().getDisplayName());
               fragmentMapSiteBinding.siteAddress.setText(item.getSite().getAddress());
               setUpSlider(item.getSite().getImageUrl());
@@ -360,8 +372,10 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
       fragmentMapSiteBinding.imageSlider.setVisibility(View.GONE);
       fragmentMapSiteBinding.applyBtn.setVisibility(View.GONE);
       fragmentMapSiteBinding.sliderIndicator.setVisibility(View.GONE);
+      fragmentMapSiteBinding.durationContainer.setVisibility(View.GONE);
 
     } else {
+      fragmentMapSiteBinding.durationContainer.setVisibility(View.VISIBLE);
       fragmentMapSiteBinding.toDetails.setVisibility(View.VISIBLE);
       fragmentMapSiteBinding.imageSlider.setVisibility(View.VISIBLE);
       fragmentMapSiteBinding.applyBtn.setVisibility(View.VISIBLE);
@@ -402,6 +416,98 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
     } catch (Resources.NotFoundException e) {
       Log.e(TAG, "Can't find style. Error: ", e);
     }
+
+    if (mGeoApiContext == null) {
+      mGeoApiContext = new GeoApiContext.Builder().apiKey(Constant.KEY_GOOGLE_MAP_API).build();
+    }
+    map.setOnPolylineClickListener(this);
+  }
+
+  private void calculateDirections(CustomMarker marker) {
+    com.google.maps.model.LatLng destination =
+        new com.google.maps.model.LatLng(
+            marker.getPosition().latitude, marker.getPosition().longitude);
+    DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
+
+    directions.alternatives(true);
+    directions.origin(
+        new com.google.maps.model.LatLng(currentUser.getLatitude(), currentUser.getLongitude()));
+    Log.d(TAG, "calculateDirections: destination: " + destination.toString());
+    directions
+        .destination(destination)
+        .setCallback(
+            new PendingResult.Callback<DirectionsResult>() {
+              @Override
+              public void onResult(DirectionsResult result) {
+
+                Log.d(TAG, "onResult: successfully retrieved directions.");
+                addPolylinesToMap(result);
+              }
+
+              @Override
+              public void onFailure(Throwable e) {
+                Log.e(TAG, "calculateDirections: Failed to get directions: " + e.getMessage());
+              }
+            });
+  }
+
+  private void addPolylinesToMap(final DirectionsResult result) {
+    new Handler(Looper.getMainLooper())
+        .post(
+            new Runnable() {
+              @Override
+              public void run() {
+                Log.d(TAG, "run: result routes: " + result.routes.length);
+                if (polylineInfoList.size() > 0) {
+                  for (PolylineInfo polylineData : polylineInfoList) {
+                    polylineData.getPolyline().remove();
+                  }
+                  polylineInfoList.clear();
+                  polylineInfoList = new ArrayList<>();
+                }
+
+                double duration = 999999999;
+                for (DirectionsRoute route : result.routes) {
+                  Log.d(TAG, "run: leg: " + route.legs[0].toString());
+                  List<com.google.maps.model.LatLng> decodedPath =
+                      PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+
+                  List<LatLng> newDecodedPath = new ArrayList<>();
+
+                  // This loops through all the LatLng coordinates of ONE polyline.
+                  for (com.google.maps.model.LatLng latLng : decodedPath) {
+
+                    //                        Log.d(TAG, "run: latlng: " + latLng.toString());
+
+                    newDecodedPath.add(new LatLng(latLng.lat, latLng.lng));
+                  }
+                  Polyline polyline = map.addPolyline(new PolylineOptions().addAll(newDecodedPath));
+                  polyline.setColor(ContextCompat.getColor(requireActivity(), R.color.grey));
+                  polyline.setClickable(true);
+                  polylineInfoList.add(
+                      PolylineInfo.builder().polyline(polyline).leg(route.legs[0]).build());
+                  double tempDuration = route.legs[0].duration.inSeconds;
+                  if (tempDuration < duration) {
+                    duration = tempDuration;
+                    onPolylineClick(polyline);
+                    zoomRoute(polyline.getPoints());
+                  }
+                }
+              }
+            });
+  }
+
+  public void zoomRoute(List<LatLng> lstLatLngRoute) {
+
+    if (map == null || lstLatLngRoute == null || lstLatLngRoute.isEmpty()) return;
+
+    LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+    for (LatLng latLngPoint : lstLatLngRoute) boundsBuilder.include(latLngPoint);
+
+    int routePadding = 50;
+    LatLngBounds latLngBounds = boundsBuilder.build();
+
+    map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, routePadding), 600, null);
   }
 
   private void setUpSlider(List<String> images) {
@@ -410,6 +516,20 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
     fragmentMapSiteBinding.sliderIndicator.setViewPager(fragmentMapSiteBinding.imageSlider);
     sliderAdapter.registerAdapterDataObserver(
         fragmentMapSiteBinding.sliderIndicator.getAdapterDataObserver());
+
+    handler = new Handler(Looper.getMainLooper());
+    runnable =
+        new Runnable() {
+          @Override
+          public void run() {
+            int position = fragmentMapSiteBinding.imageSlider.getCurrentItem();
+            if (position == images.size() - 1) {
+              fragmentMapSiteBinding.imageSlider.setCurrentItem(0);
+            } else {
+              fragmentMapSiteBinding.imageSlider.setCurrentItem(position + 1);
+            }
+          }
+        };
 
     fragmentMapSiteBinding.imageSlider.registerOnPageChangeCallback(
         new ViewPager2.OnPageChangeCallback() {
@@ -420,5 +540,28 @@ public class MapSiteFragment extends Fragment implements OnMapReadyCallback {
             handler.postDelayed(runnable, 3000);
           }
         });
+  }
+
+  @Override
+  public void onPolylineClick(@NonNull Polyline polyline) {
+    int index = 0;
+    for (PolylineInfo polylineData : polylineInfoList) {
+      index++;
+      Log.d(TAG, "onPolylineClick: toString: " + polylineData.toString());
+      if (polyline.getId().equals(polylineData.getPolyline().getId())) {
+        polylineData
+            .getPolyline()
+            .setColor(ContextCompat.getColor(requireActivity(), R.color.primary_200));
+        polylineData.getPolyline().setZIndex(1);
+
+        LatLng endLocation =
+            new LatLng(
+                polylineData.getLeg().endLocation.lat, polylineData.getLeg().endLocation.lng);
+        fragmentMapSiteBinding.duration.setText(polylineData.getLeg().duration.toString());
+      } else {
+        polylineData.getPolyline().setColor(ContextCompat.getColor(getActivity(), R.color.grey));
+        polylineData.getPolyline().setZIndex(0);
+      }
+    }
   }
 }

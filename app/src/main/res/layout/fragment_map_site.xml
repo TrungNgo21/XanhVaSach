@@ -27,7 +27,7 @@
             android:id="@+id/siteName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Don Chicken"
+            android:text="Choose a site to view info"
             android:layout_marginBottom="@dimen/_2sdp"
             style="@style/GeneralCardHeading1" />
 
@@ -36,7 +36,28 @@
             android:layout_height="wrap_content"
             android:id="@+id/siteAddress"
             style="@style/GeneralInfoNormal1"
-            android:text="700 Nguyen Van linh " />
+            android:text="A route will lead you to your desire location!" />
+
+        <LinearLayout
+            android:id="@+id/durationContainer"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoNormal1"
+                android:text="Duration: " />
+
+            <TextView
+                android:layout_marginStart="@dimen/_2sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/duration"
+                android:textStyle="bold"
+                style="@style/GeneralInfoNormal1" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_marginTop="@dimen/_4sdp"
@@ -45,11 +66,13 @@
             android:orientation="vertical">
 
             <androidx.viewpager2.widget.ViewPager2
+                android:visibility="gone"
                 android:id="@+id/imageSlider"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_120sdp" />
 
             <me.relex.circleindicator.CircleIndicator3
+                android:visibility="gone"
                 android:id="@+id/sliderIndicator"
                 map:ci_drawable="@drawable/slider_indicator"
                 android:layout_width="match_parent"
@@ -63,6 +86,7 @@
 
             <Button
                 android:id="@+id/toDetails"
+                android:visibility="gone"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="@dimen/_4sdp"
                 android:layout_width="wrap_content"
@@ -71,6 +95,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                android:visibility="gone"
                 android:id="@+id/applyBtn"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="@dimen/_4sdp"

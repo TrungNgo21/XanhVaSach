@@ -88,5 +88,7 @@ dependencies {
 
     implementation("me.relex:circleindicator:2.1.6")
 
+    implementation("com.google.maps:google-maps-services:2.2.0")
+    implementation("org.slf4j:slf4j-simple:1.7.25")
 
 }

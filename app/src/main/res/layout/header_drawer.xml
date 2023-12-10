@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_200sdp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/header" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_80sdp"
+        android:layout_alignBottom="@+id/imageView"
+        android:alpha="0.4"
+        android:background="@color/black"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_4sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_alignTop="@+id/linearLayout2"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:layout_alignBottom="@+id/imageView">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="@dimen/_60sdp"
+            android:layout_height="@dimen/_60sdp"
+            android:scaleType="fitXY"
+            android:src="@drawable/header"
+            android:id="@+id/userImage"
+            app:riv_corner_radius="@dimen/_200sdp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/displayName"
+                style="@style/GeneralCardHeading1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TRung ngo"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/email"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ngolambaotrung@gmail.com" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

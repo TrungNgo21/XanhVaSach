@@ -11,6 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
+import com.trungngo.xanhandsach.Dto.UserDto;
+import com.trungngo.xanhandsach.Model.Report;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.Shared.Constant;
 import com.trungngo.xanhandsach.Shared.PreferenceManager;
@@ -23,10 +25,14 @@ public class SiteService {
   private final FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
   private final CollectionReference siteReference =
       fireStore.collection(Constant.KEY_COLLECTION_SITES);
+
+  private UserService userService;
+
   private PreferenceManager preferenceManager;
 
   public SiteService(Context context) {
     this.preferenceManager = new PreferenceManager(context.getApplicationContext());
+    this.userService = new UserService(context);
   }
 
   public void getAllSite(String userId, final FirebaseCallback<Result<List<SiteDto>>> callback) {
@@ -74,6 +80,24 @@ public class SiteService {
             documentReference -> {
               String id = documentReference.getId();
               site.setId(id);
+              userService.updateUserSiteId(
+                  id,
+                  new FirebaseCallback<Result<UserDto>>() {
+                    @Override
+                    public void callbackListRes(List<Result<UserDto>> listT) {}
+
+                    @Override
+                    public void callbackRes(Result<UserDto> userDtoResult) {
+                      if (userDtoResult instanceof Result.Success) {
+                        UserDto currentUser = ((Result.Success<UserDto>) userDtoResult).getData();
+                        currentUser.setSiteId(id);
+                        preferenceManager.putCurrentUser(currentUser);
+                        Log.d("Update site", "Successfully");
+                      } else {
+                        Log.d("Update site", "Error!");
+                      }
+                    }
+                  });
             })
         .addOnCompleteListener(
             createSiteTask -> {
@@ -98,6 +122,25 @@ public class SiteService {
             task -> {
               if (task.isSuccessful()) {
                 callback.callbackRes(new Result.Success<>(updatedSite));
+              } else {
+                callback.callbackRes(new Result.Error(task.getException()));
+              }
+            });
+  }
+
+  public void updateSiteReports(
+      String id, Report report, final FirebaseCallback<Result<Report>> callback) {
+    siteReference
+        .document(id)
+        .update("reports", FieldValue.arrayUnion(report))
+        .addOnFailureListener(
+            task -> {
+              Log.d("Update failed", task.getMessage());
+            })
+        .addOnCompleteListener(
+            task -> {
+              if (task.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(report));
               } else {
                 callback.callbackRes(new Result.Error(task.getException()));
               }

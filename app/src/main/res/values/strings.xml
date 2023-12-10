@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">XanhAndSach</string>
     <string name="mock_up_title">My application</string>
-    <string name="google_map_key">AIzaSyBYWCCuABKDmG63wYzb05t_DWK87N9AmWI</string>
+    <string name="google_map_key">AIzaSyDWzf27VCIQxu47qtXGw-1G3-M4cxR7LqQ</string>
     <string name="authentication_default_error">
         Authentication failed! Try again.
     </string>
@@ -38,6 +38,10 @@
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 
 </resources>

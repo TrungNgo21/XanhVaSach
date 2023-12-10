@@ -28,14 +28,12 @@
         android:layout_toEndOf="@+id/backIcon"
         android:layout_marginStart="@dimen/_3sdp" />
 
-    <ImageView
+    <androidx.appcompat.widget.Toolbar
+        
         android:id="@+id/menuIconId"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/menu_icon" />
-
+        android:background="@drawable/menu_icon" />
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.trungngo.xanhandsach.Model;
 
+import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Shared.Constant;
 
@@ -18,6 +19,7 @@ public class User {
   private String password;
   private String image;
   private String displayName;
+  private String siteId;
   @Builder.Default private String fcmToken = null;
   @Builder.Default private String permission = Constant.KEY_PERMISSION_USER;
 
@@ -29,6 +31,7 @@ public class User {
         .permission(permission)
         .image(image)
         .displayName(displayName)
+        .siteId(siteId)
         .build();
   }
 }

@@ -94,4 +94,15 @@
         <item name="android:textStyle">italic</item>
         <item name="android:layout_marginStart">@dimen/_4sdp</item>
     </style>
+
+    <style name="CustomChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="checkedIconTint">@color/primary_200</item>
+        <item name="chipBackgroundColor">@color/chip_bg_selector</item>
+        <item name="chipCornerRadius">@dimen/_8sdp</item>
+        <item name="android:width">@dimen/_100sdp</item>
+        <item name="android:textColor">@color/chip_selector</item>
+        <item name="chipStrokeColor">@color/chip_selector</item>
+        <item name="chipStrokeWidth">@dimen/_1sdp</item>
+        <item name="checkedIconVisible">false</item>
+    </style>
 </resources>

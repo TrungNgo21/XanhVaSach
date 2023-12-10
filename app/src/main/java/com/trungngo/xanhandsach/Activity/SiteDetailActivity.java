@@ -2,20 +2,28 @@ package com.trungngo.xanhandsach.Activity;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,13 +36,16 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.material.navigation.NavigationView;
 import com.trungngo.xanhandsach.Adapter.SiteAdapter;
 import com.trungngo.xanhandsach.Adapter.SliderAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
+import com.trungngo.xanhandsach.Service.UserService;
 import com.trungngo.xanhandsach.Shared.Constant;
+import com.trungngo.xanhandsach.Shared.ImageHandler;
 import com.trungngo.xanhandsach.Shared.Result;
 import com.trungngo.xanhandsach.Shared.SeverityChipHandler;
 import com.trungngo.xanhandsach.databinding.ActivitySignInBinding;
@@ -53,40 +64,30 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
 
   private List<String> images;
 
+  private UserService userService;
+
   private GoogleMap map;
 
   private Marker marker;
 
   private LatLng coordinates;
 
-  private final Handler handler = new Handler(Looper.getMainLooper());
-  private final Runnable runnable =
-      new Runnable() {
-        @Override
-        public void run() {
-          int position = siteDetailBinding.imageSlider.getCurrentItem();
-          if (position == images.size() - 1) {
-            siteDetailBinding.imageSlider.setCurrentItem(0);
-          } else {
-            siteDetailBinding.imageSlider.setCurrentItem(position + 1);
-          }
-        }
-      };
+  private Handler handler;
+
+  private Runnable runnable;
+
+  private DrawerLayout drawerLayout;
+  private NavigationView navigationView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     siteDetailBinding = ActivitySiteDetailBinding.inflate(getLayoutInflater());
     setContentView(siteDetailBinding.getRoot());
-    List<String> images = new ArrayList<>();
     siteService = new SiteService(this);
-
-    images.add(
-        "https://firebasestorage.googleapis.com/v0/b/xanhandsach.appspot.com/o/4hAsZETOX6Hl0uCwQbC4%2F419ff9c5-4d46-4909-9ebc-7d526fc4b03d?alt=media&token=e6588dc3-e97f-42a8-85fd-acdf0aa753bc");
-    images.add(
-        "https://firebasestorage.googleapis.com/v0/b/xanhandsach.appspot.com/o/4hAsZETOX6Hl0uCwQbC4%2F81d9b2a9-56b5-4831-98f0-29026f282672?alt=media&token=301f2301-8bca-4dee-927c-5319e12a7bbb");
-    this.images = images;
+    userService = new UserService(this);
     setUpGuestPerspective();
+    setUpDrawer();
   }
 
   private void setUpGuestPerspective() {
@@ -104,7 +105,6 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             if (siteDtoResult instanceof Result.Success) {
               View chipView = siteDetailBinding.severityChip.getRoot();
               SiteDto getSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
-              setUpSlider(getSite.getImageUrl());
               siteDetailBinding.siteAddress.setText(getSite.getAddress());
               siteDetailBinding.createdDate.setText(getSite.getCreatedDate());
               siteDetailBinding.siteOwnerEmail.setText(getSite.getOwner().getEmail());
@@ -112,6 +112,20 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
               SeverityChipHandler.chipDirective(
                   getSite.getSeverity(), chipView, SiteDetailActivity.this);
               coordinates = new LatLng(getSite.getLatitude(), getSite.getLongitude());
+              handler = new Handler(Looper.getMainLooper());
+              runnable =
+                  new Runnable() {
+                    @Override
+                    public void run() {
+                      int position = siteDetailBinding.imageSlider.getCurrentItem();
+                      if (position == getSite.getImageUrl().size() - 1) {
+                        siteDetailBinding.imageSlider.setCurrentItem(0);
+                      } else {
+                        siteDetailBinding.imageSlider.setCurrentItem(position + 1);
+                      }
+                    }
+                  };
+              setUpSlider(getSite.getImageUrl());
               siteDetailBinding.progressBarHolder.setVisibility(View.GONE);
               showMap();
             }
@@ -140,12 +154,19 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
   @Override
   protected void onPause() {
     super.onPause();
+    if (handler == null) {
+      return;
+    }
+
     handler.removeCallbacks(runnable);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
+    if (handler == null) {
+      return;
+    }
     handler.postDelayed(runnable, 3000);
   }
 
@@ -192,5 +213,68 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     }
     map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f));
     marker = map.addMarker(new MarkerOptions().position(coordinates));
+  }
+
+  private void setUpDrawer() {
+    drawerLayout = siteDetailBinding.drawer;
+    navigationView = siteDetailBinding.navView;
+    siteDetailBinding.toolbarId.toolbarTitleId.setText("Site detail");
+    siteDetailBinding.toolbarId.backIcon.setOnClickListener(
+        view -> {
+          finish();
+        });
+
+    View headerView = navigationView.getHeaderView(0);
+    TextView currentUserName = headerView.findViewById(R.id.displayName);
+    TextView currentUserEmail = headerView.findViewById(R.id.email);
+    ImageView currentUserImg = headerView.findViewById(R.id.userImage);
+    drawerLayout.closeDrawer(GravityCompat.START);
+
+    navigationView.bringToFront();
+
+    currentUserName.setText(userService.getCurrentUser().getDisplayName());
+    currentUserEmail.setText(userService.getCurrentUser().getEmail());
+    ImageHandler.setImage(
+        ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
+    setSupportActionBar(siteDetailBinding.toolbarId.menuIconId);
+    //    navigationView.bringToFront();
+    ActionBarDrawerToggle drawerToggle =
+        new ActionBarDrawerToggle(
+            this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    drawerLayout.addDrawerListener(drawerToggle);
+    //    drawerToggle.syncState();
+    siteDetailBinding.toolbarId.menuIconId.setOnClickListener(
+        view -> {
+          if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+          } else {
+            drawerLayout.openDrawer(GravityCompat.START);
+          }
+        });
+
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              Intent intent = new Intent(SiteDetailActivity.this, AddSiteActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(SiteDetailActivity.this, SignInActivity.class);
+              userService.signOut();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
   }
 }

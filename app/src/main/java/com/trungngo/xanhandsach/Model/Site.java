@@ -27,6 +27,8 @@ public class Site {
   private Double longitude;
   private String address;
   private String description;
+  private boolean isDeleted;
+  private List<Report> reports;
   @Builder.Default private List<String> imageUrl = new ArrayList<>();
   @Builder.Default private List<UserDto> volunteers = new ArrayList<>();
   @Builder.Default private Date createdDate = new Date();

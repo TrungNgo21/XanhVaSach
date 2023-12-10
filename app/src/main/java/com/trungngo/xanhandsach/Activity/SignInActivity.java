@@ -99,16 +99,12 @@ public class SignInActivity extends AppCompatActivity {
         view -> {
           startActivity(new Intent(this, SignUpActivity.class));
         });
-    activitySignInBinding.clearTemp.setOnClickListener(
-        view -> {
-          userService.signOut();
-        });
   }
 
   private void setUpToolbar() {
     activitySignInBinding.toolbarId.toolbarTitleId.setText(Constant.KEY_SIGN_IN_TITLE);
-    activitySignInBinding.toolbarId.backIcon.setVisibility(View.INVISIBLE);
-    activitySignInBinding.toolbarId.menuIconId.setVisibility(View.INVISIBLE);
+    activitySignInBinding.toolbarId.backIcon.setVisibility(View.GONE);
+    activitySignInBinding.toolbarId.menuIconId.setVisibility(View.GONE);
   }
 
   private void setEnableFormControl(boolean isEnabled) {
