@@ -36,6 +36,7 @@ public class SiteService {
 
   public void getAllSite(String userId, final FirebaseCallback<Result<List<SiteDto>>> callback) {
     siteReference
+        .whereNotEqualTo("owner.id", userId)
         .get()
         .addOnCompleteListener(
             getSiteTask -> {

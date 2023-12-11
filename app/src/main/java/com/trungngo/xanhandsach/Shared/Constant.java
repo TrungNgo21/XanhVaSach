@@ -26,6 +26,8 @@ public class Constant {
 
   public static final String KEY_SIGN_IN = "isSignIn";
   public static final String KEY_PERMISSION_ADMIN = "super";
+  public static final String KEY_SERVER_MESSAGE =
+      "AAAArWRx7TA:APA91bHNR6qQF6R4EKLANtVn-4yUAyw1GyzSHM-gRPtQiy8F9qbERjB3Zesc9XTLamuleFlOsP-L9zahBrsha5ZWfHpOD8VyaQ4gzKCC78uQPJvPFGFLf9fAH8xUatKfF27Zao8CFiGO";
 
   public static final String NO_IMG_DEFAULT =
       "https://firebasestorage.googleapis.com/v0/b/xanhandsach.appspot.com/o/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg?alt=media&token=89dc60ba-9f96-44a5-b1c8-77dab4802c44";

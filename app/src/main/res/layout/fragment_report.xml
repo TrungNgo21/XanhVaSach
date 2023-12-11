@@ -114,7 +114,7 @@
                     <TextView
                         android:id="@+id/selectedDate"
                         android:layout_width="match_parent"
-                        android:gravity="center_vertical"
+                        android:gravity="center"
                         style="@style/GeneralCardHeading2"
                         android:layout_height="match_parent" />
                 </LinearLayout>
