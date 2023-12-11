@@ -3,7 +3,6 @@ package com.trungngo.xanhandsach.Service;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -110,6 +109,21 @@ public class SiteService {
   }
 
   public void updateSite(
+      String siteId, Site updatedSite, final FirebaseCallback<Result<Site>> callback) {
+    siteReference
+        .document(siteId)
+        .set(updatedSite)
+        .addOnCompleteListener(
+            task -> {
+              if (task.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(updatedSite));
+              } else {
+                callback.callbackRes(new Result.Error(task.getException()));
+              }
+            });
+  }
+
+  public void updateSiteImgs(
       String id, Site updatedSite, final FirebaseCallback<Result<Site>> callback) {
     siteReference
         .document(id)

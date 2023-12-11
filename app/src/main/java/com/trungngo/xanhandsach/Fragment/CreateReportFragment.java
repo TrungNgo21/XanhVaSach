@@ -1,7 +1,6 @@
 package com.trungngo.xanhandsach.Fragment;
 
 import android.app.DatePickerDialog;
-import android.graphics.LinearGradient;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -10,16 +9,13 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Model.Report;
@@ -35,9 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
-public class ReportFragment extends Fragment {
+public class CreateReportFragment extends Fragment {
 
   private FragmentReportBinding fragmentReportBinding;
 

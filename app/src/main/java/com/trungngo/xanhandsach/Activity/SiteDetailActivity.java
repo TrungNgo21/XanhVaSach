@@ -2,6 +2,8 @@ package com.trungngo.xanhandsach.Activity;
 
 import static android.content.ContentValues.TAG;
 
+import static java.util.Arrays.asList;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -108,6 +110,8 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
               siteDetailBinding.siteAddress.setText(getSite.getAddress());
               siteDetailBinding.createdDate.setText(getSite.getCreatedDate());
               siteDetailBinding.siteOwnerEmail.setText(getSite.getOwner().getEmail());
+              siteDetailBinding.siteOwner.setText(getSite.getOwner().getDisplayName());
+              siteDetailBinding.siteName.setText(getSite.getDisplayName());
               siteDetailBinding.siteDes.setText(getSite.getDescription());
               SeverityChipHandler.chipDirective(
                   getSite.getSeverity(), chipView, SiteDetailActivity.this);
@@ -134,6 +138,9 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
   }
 
   private void setUpSlider(List<String> images) {
+    if (images.isEmpty()) {
+      images = new ArrayList<>(asList(Constant.NO_IMG_DEFAULT));
+    }
     SliderAdapter sliderAdapter = new SliderAdapter(this, images);
     siteDetailBinding.imageSlider.setAdapter(sliderAdapter);
     siteDetailBinding.sliderIndicator.setViewPager(siteDetailBinding.imageSlider);
@@ -258,15 +265,23 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
           public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
             if (menuItem.getItemId() == R.id.nav_home) {
               Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              finish();
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_site) {
               Intent intent = new Intent(SiteDetailActivity.this, AddSiteActivity.class);
+              finish();
+
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_chat) {
+
               Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+
+              finish();
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
               Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+
+              finish();
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(SiteDetailActivity.this, SignInActivity.class);

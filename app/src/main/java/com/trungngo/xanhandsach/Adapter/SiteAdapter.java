@@ -1,5 +1,7 @@
 package com.trungngo.xanhandsach.Adapter;
 
+import static java.util.Arrays.asList;
+
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -15,7 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.R;
+import com.trungngo.xanhandsach.Shared.Constant;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.SiteHolder> {
@@ -48,8 +53,12 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.SiteHolder> {
   @Override
   public void onBindViewHolder(@NonNull SiteHolder holder, int position) {
     SiteDto selectedSite = siteList.get(position);
+    List<String> imageUrls = selectedSite.getImageUrl();
+    if (selectedSite.getImageUrl().isEmpty()) {
+      imageUrls = new ArrayList<>(Collections.singletonList(Constant.NO_IMG_DEFAULT));
+    }
     Picasso.get()
-        .load(Uri.parse(selectedSite.getImageUrl().get(0)))
+        .load(Uri.parse(imageUrls.get(0)))
         .placeholder(R.drawable.bg_main)
         .into(holder.siteImage);
     holder.siteName.setText(selectedSite.getDisplayName());

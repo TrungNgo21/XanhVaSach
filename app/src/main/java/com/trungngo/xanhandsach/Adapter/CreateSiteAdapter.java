@@ -5,10 +5,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.trungngo.xanhandsach.Fragment.CreateReportFragment;
 import com.trungngo.xanhandsach.Fragment.CreateSiteFragment;
 import com.trungngo.xanhandsach.Fragment.GeneralSiteFragment;
 import com.trungngo.xanhandsach.Fragment.MapSiteFragment;
-import com.trungngo.xanhandsach.Fragment.ReportFragment;
 import com.trungngo.xanhandsach.Fragment.ViewReportFragment;
 
 public class CreateSiteAdapter extends FragmentStateAdapter {
@@ -25,7 +25,7 @@ public class CreateSiteAdapter extends FragmentStateAdapter {
         return new CreateSiteFragment();
 
       case 1:
-        return new ReportFragment();
+        return new CreateReportFragment();
       case 2:
         return new ViewReportFragment();
       default:

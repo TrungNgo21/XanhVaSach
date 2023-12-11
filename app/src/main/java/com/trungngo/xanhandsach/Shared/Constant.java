@@ -1,9 +1,12 @@
 package com.trungngo.xanhandsach.Shared;
 
+import static org.slf4j.MDC.put;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Constant {
 
@@ -23,6 +26,18 @@ public class Constant {
 
   public static final String KEY_SIGN_IN = "isSignIn";
   public static final String KEY_PERMISSION_ADMIN = "super";
+
+  public static final String NO_IMG_DEFAULT =
+      "https://firebasestorage.googleapis.com/v0/b/xanhandsach.appspot.com/o/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg?alt=media&token=89dc60ba-9f96-44a5-b1c8-77dab4802c44";
+
+  public static final Map<String, Integer> SEVERITY_MAP =
+      new HashMap<String, Integer>() {
+        {
+          put("Quite Dirty", 0);
+          put("Dirty", 1);
+          put("Extremely Dirty", 2);
+        }
+      };
   public static final String KEY_PERMISSION_USER = "user";
   public static final String KEY_PERMISSION_USER_ADMIN = "admin";
 

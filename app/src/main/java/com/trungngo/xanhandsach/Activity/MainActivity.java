@@ -1,9 +1,11 @@
 package com.trungngo.xanhandsach.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.navigation.NavigationView;
@@ -39,8 +42,22 @@ public class MainActivity extends AppCompatActivity {
     activityMainBinding = ActivityMainBinding.inflate(getLayoutInflater());
     setContentView(activityMainBinding.getRoot());
     userService = new UserService(this);
-    mainTabAdapter = new MainTabAdapter(this);
+    mainTabAdapter = new MainTabAdapter(getSupportFragmentManager());
     activityMainBinding.pageContent.setAdapter(mainTabAdapter);
+    activityMainBinding.pageContent.addOnPageChangeListener(
+        new ViewPager.OnPageChangeListener() {
+          @Override
+          public void onPageScrolled(
+              int position, float positionOffset, int positionOffsetPixels) {}
+
+          @Override
+          public void onPageSelected(int position) {
+            activityMainBinding.tabLayout.getTabAt(position).select();
+          }
+
+          @Override
+          public void onPageScrollStateChanged(int state) {}
+        });
 
     activityMainBinding.tabLayout.addOnTabSelectedListener(
         new TabLayout.OnTabSelectedListener() {
@@ -55,14 +72,15 @@ public class MainActivity extends AppCompatActivity {
           @Override
           public void onTabReselected(TabLayout.Tab tab) {}
         });
-    activityMainBinding.pageContent.registerOnPageChangeCallback(
-        new ViewPager2.OnPageChangeCallback() {
-          @Override
-          public void onPageSelected(int position) {
-            super.onPageSelected(position);
-            activityMainBinding.tabLayout.getTabAt(position).select();
-          }
-        });
+    //    activityMainBinding.pageContent((v, event) -> true);
+    //    activityMainBinding.pageContent.registerOnPageChangeCallback(
+    //        new ViewPager2.OnPageChangeCallback() {
+    //          @Override
+    //          public void onPageSelected(int position) {
+    //            super.onPageSelected(position);
+    //            activityMainBinding.tabLayout.getTabAt(position).select();
+    //          }
+    //        });
     setUpDrawer();
   }
 

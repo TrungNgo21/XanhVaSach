@@ -26,7 +26,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,21 +49,24 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.squareup.picasso.Picasso;
-import com.trungngo.xanhandsach.Activity.AddSiteActivity;
 import com.trungngo.xanhandsach.Adapter.ImageAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
+import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.ImageService;
 import com.trungngo.xanhandsach.Service.SiteService;
 import com.trungngo.xanhandsach.Service.UserService;
 import com.trungngo.xanhandsach.Shared.Constant;
+import com.trungngo.xanhandsach.Shared.DateFormatter;
 import com.trungngo.xanhandsach.Shared.InputValidator;
 import com.trungngo.xanhandsach.Shared.Result;
 import com.trungngo.xanhandsach.databinding.FragmentCreateSiteBinding;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreateSiteFragment extends Fragment
     implements OnMapReadyCallback,
@@ -85,6 +87,7 @@ public class CreateSiteFragment extends Fragment
   private ImageAdapter imageAdapter;
 
   private String severityCategory;
+  private SiteDto currentSite;
 
   private ImageService imageService;
 
@@ -102,7 +105,12 @@ public class CreateSiteFragment extends Fragment
     imageAdapter = new ImageAdapter(requireContext(), this, this);
     imageAdapter.setData(uriList);
     fragmentCreateSiteBinding.imagesSelectedId.setAdapter(imageAdapter);
-    initialSetup();
+    if (userService.getCurrentUser().getSiteId() != null) {
+      ownerSetUp();
+    } else {
+
+      initialSetup();
+    }
     setUpButtonPressed();
     setUpAutoCompleteAddress();
     setUpSpinner();
@@ -121,6 +129,58 @@ public class CreateSiteFragment extends Fragment
     setEnabledSubmitButton(false);
   }
 
+  private void ownerSetUp() {
+    setIsLoading(true);
+    fragmentCreateSiteBinding.createSiteButton.setText("Update site");
+    initialSetup();
+    siteService.getOneSite(
+        userService.getCurrentUser().getSiteId(),
+        new FirebaseCallback<Result<SiteDto>>() {
+          @Override
+          public void callbackListRes(List<Result<SiteDto>> listT) {}
+
+          @Override
+          public void callbackRes(Result<SiteDto> siteDtoResult) {
+            if (siteDtoResult instanceof Result.Success) {
+              SiteDto siteDto = ((Result.Success<SiteDto>) siteDtoResult).getData();
+              currentSite = siteDto;
+              //              List<Uri> currentSiteImgs =
+              //
+              // siteDto.getImageUrl().stream().map(Uri::parse).collect(Collectors.toList());
+              if (!siteDto.getImageUrl().isEmpty()) {
+                uriList =
+                    siteDto.getImageUrl().stream().map(Uri::parse).collect(Collectors.toList());
+              }
+              imageAdapter.setData(uriList);
+              fragmentCreateSiteBinding.siteName.setText(siteDto.getDisplayName());
+              fragmentCreateSiteBinding.description.setText(siteDto.getDescription());
+              fragmentCreateSiteBinding.volunNumId.setText(
+                  String.valueOf(siteDto.getMaxCapacity()));
+              fragmentCreateSiteBinding.volunNumId.setEnabled(false);
+              fragmentCreateSiteBinding.addressDisplay.setText(siteDto.getAddress());
+              fragmentCreateSiteBinding.imageNumberId.setText(uriList.size() + "/" + "8");
+              if (!uriList.isEmpty()) {
+                fragmentCreateSiteBinding.noImageSelected.setVisibility(View.INVISIBLE);
+              } else {
+                fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
+              }
+              coordinates = new LatLng(siteDto.getLatitude(), siteDto.getLongitude());
+              fragmentCreateSiteBinding.severityCate.setSelection(
+                  Constant.SEVERITY_MAP.get(siteDto.getSeverity()));
+              setIsLoading(false);
+            }
+          }
+        });
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (userService.getCurrentUser().getSiteId() != null) {
+      ownerSetUp();
+    }
+  }
+
   private void setUpButtonPressed() {
     fragmentCreateSiteBinding.addImageButtonId.setOnClickListener(
         view -> {
@@ -130,6 +190,24 @@ public class CreateSiteFragment extends Fragment
   }
 
   private Site createSite() {
+    if (userService.getCurrentUser().getSiteId() != null) {
+      return Site.builder()
+          .id(userService.getCurrentUser().getSiteId())
+          .displayName(fragmentCreateSiteBinding.siteName.getText().toString())
+          .owner(userService.getCurrentUser())
+          .maxCapacity(Integer.parseInt(fragmentCreateSiteBinding.volunNumId.getText().toString()))
+          .severity(severityCategory)
+          .description(fragmentCreateSiteBinding.description.getText().toString())
+          .address(fragmentCreateSiteBinding.addressDisplay.getText().toString())
+          .longitude(coordinates.longitude)
+          .latitude(coordinates.latitude)
+          .imageUrl(currentSite.getImageUrl())
+          .reports(currentSite.getReports())
+          .volunteers(currentSite.getVolunteers())
+          .createdDate(DateFormatter.toDate(currentSite.getCreatedDate()))
+          .updatedDate(new Date())
+          .build();
+    }
     return Site.builder()
         .displayName(fragmentCreateSiteBinding.siteName.getText().toString())
         .owner(userService.getCurrentUser())
@@ -153,7 +231,7 @@ public class CreateSiteFragment extends Fragment
           @Override
           public void callbackRes(Result<List<String>> listResult) {
             if (listResult instanceof Result.Success) {
-              siteService.updateSite(
+              siteService.updateSiteImgs(
                   site.getId(),
                   site,
                   new FirebaseCallback<Result<Site>>() {
@@ -179,65 +257,138 @@ public class CreateSiteFragment extends Fragment
     setIsLoading(true);
 
     Site createdSite = createSite();
-    siteService.createSite(
-        createdSite,
-        new FirebaseCallback<Result<Site>>() {
-          @Override
-          public void callbackListRes(List<Result<Site>> listT) {}
+    if (userService.getCurrentUser().getSiteId() != null) {
+      siteService.updateSite(
+          currentSite.getId(),
+          createdSite,
+          new FirebaseCallback<Result<Site>>() {
+            @Override
+            public void callbackListRes(List<Result<Site>> listT) {}
 
-          @Override
-          public void callbackRes(Result<Site> siteResult) {
-            if (siteResult instanceof Result.Success) {
-              Site site = ((Result.Success<Site>) siteResult).getData();
-              if (uriList.isEmpty()) {
-                Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+            @Override
+            public void callbackRes(Result<Site> siteResult) {
+              if (siteResult instanceof Result.Success) {
+                List<Uri> currentSiteImg =
+                    currentSite.getImageUrl().stream().map(Uri::parse).collect(Collectors.toList());
+                if (!uriList.equals(currentSiteImg)) {
+                  if (uriList.isEmpty()) {
+                    Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+                    setEnabledUi(true);
+                    setIsLoading(false);
+                  } else {
+                    imageService.uploadImages(
+                        uriList,
+                        createdSite.getId(),
+                        new FirebaseCallback<Result<List<String>>>() {
+                          @Override
+                          public void callbackListRes(List<Result<List<String>>> listT) {}
+
+                          @Override
+                          public void callbackRes(Result<List<String>> listResult) {
+                            if (listResult instanceof Result.Success) {
+                              createdSite.setImageUrl(
+                                  ((Result.Success<List<String>>) listResult).getData());
+                              siteService.updateSiteImgs(
+                                  createdSite.getId(),
+                                  createdSite,
+                                  new FirebaseCallback<Result<Site>>() {
+                                    @Override
+                                    public void callbackListRes(List<Result<Site>> listT) {}
+
+                                    @Override
+                                    public void callbackRes(Result<Site> siteResult) {
+                                      if (siteResult instanceof Result.Success) {
+                                        Toast.makeText(
+                                                requireContext(), "Successful!", Toast.LENGTH_SHORT)
+                                            .show();
+                                        setEnabledUi(true);
+                                        setIsLoading(false);
+                                      } else {
+                                        Toast.makeText(
+                                                requireContext(), "Error!", Toast.LENGTH_SHORT)
+                                            .show();
+                                        setEnabledUi(true);
+                                        setIsLoading(false);
+                                      }
+                                    }
+                                  });
+                            }
+                          }
+                        });
+                  }
+                } else {
+                  Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+                  setEnabledUi(true);
+                  setIsLoading(false);
+                }
+              } else {
+                Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT).show();
                 setEnabledUi(true);
                 setIsLoading(false);
               }
-              imageService.uploadImages(
-                  uriList,
-                  site.getId(),
-                  new FirebaseCallback<Result<List<String>>>() {
-                    @Override
-                    public void callbackListRes(List<Result<List<String>>> listT) {}
-
-                    @Override
-                    public void callbackRes(Result<List<String>> listResult) {
-                      if (listResult instanceof Result.Success) {
-                        site.setImageUrl(((Result.Success<List<String>>) listResult).getData());
-                        siteService.updateSite(
-                            site.getId(),
-                            site,
-                            new FirebaseCallback<Result<Site>>() {
-                              @Override
-                              public void callbackListRes(List<Result<Site>> listT) {}
-
-                              @Override
-                              public void callbackRes(Result<Site> siteResult) {
-                                if (siteResult instanceof Result.Success) {
-                                  Toast.makeText(
-                                          requireContext(), "Successful!", Toast.LENGTH_SHORT)
-                                      .show();
-                                  setEnabledUi(true);
-                                  setIsLoading(false);
-                                } else {
-                                  Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT)
-                                      .show();
-                                  setEnabledUi(true);
-                                  setIsLoading(false);
-                                }
-                              }
-                            });
-                      }
-                    }
-                  });
-            } else {
-              Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT).show();
-              setEnabledUi(true);
-              setIsLoading(false);
             }
-          }
-        });
+          });
+    } else {
+      siteService.createSite(
+          createdSite,
+          new FirebaseCallback<Result<Site>>() {
+            @Override
+            public void callbackListRes(List<Result<Site>> listT) {}
+
+            @Override
+            public void callbackRes(Result<Site> siteResult) {
+              if (siteResult instanceof Result.Success) {
+                Site site = ((Result.Success<Site>) siteResult).getData();
+                if (uriList.isEmpty()) {
+                  Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+                  setEnabledUi(true);
+                  setIsLoading(false);
+                }
+                imageService.uploadImages(
+                    uriList,
+                    site.getId(),
+                    new FirebaseCallback<Result<List<String>>>() {
+                      @Override
+                      public void callbackListRes(List<Result<List<String>>> listT) {}
+
+                      @Override
+                      public void callbackRes(Result<List<String>> listResult) {
+                        if (listResult instanceof Result.Success) {
+                          site.setImageUrl(((Result.Success<List<String>>) listResult).getData());
+                          siteService.updateSiteImgs(
+                              site.getId(),
+                              site,
+                              new FirebaseCallback<Result<Site>>() {
+                                @Override
+                                public void callbackListRes(List<Result<Site>> listT) {}
+
+                                @Override
+                                public void callbackRes(Result<Site> siteResult) {
+                                  if (siteResult instanceof Result.Success) {
+                                    Toast.makeText(
+                                            requireContext(), "Successful!", Toast.LENGTH_SHORT)
+                                        .show();
+                                    setEnabledUi(true);
+                                    setIsLoading(false);
+                                  } else {
+                                    Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT)
+                                        .show();
+                                    setEnabledUi(true);
+                                    setIsLoading(false);
+                                  }
+                                }
+                              });
+                        }
+                      }
+                    });
+              } else {
+                Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT).show();
+                setEnabledUi(true);
+                setIsLoading(false);
+              }
+            }
+          });
+    }
   }
 
   private final ActivityResultLauncher<Intent> pickImages =
@@ -290,7 +441,8 @@ public class CreateSiteFragment extends Fragment
 
   @Override
   public void clickDelete(int leftNum) {
-    fragmentCreateSiteBinding.imageNumberId.setText(uriList.size() + "/" + "8");
+    fragmentCreateSiteBinding.imageNumberId.setText(leftNum + "/" + "8");
+
     if (uriList.isEmpty()) {
       fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
     } else {
