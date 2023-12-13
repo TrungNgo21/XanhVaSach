@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reportFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,7 +14,38 @@
         style="@style/GeneralCardHeading1"
         android:layout_marginBottom="@dimen/_4sdp" />
 
+    <LinearLayout
+        android:id="@+id/notHaveSite"
+        android:background="@color/white"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="@dimen/_4sdp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_200sdp"
+            android:scaleType="fitXY"
+            android:src="@drawable/error_404" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GeneralCardHeading"
+            android:text="Not have a site yet! Create one ?" />
+
+        <Button
+            android:id="@+id/toCreateSite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/primary_dark"
+            android:text="Go to create site" />
+    </LinearLayout>
+
     <ScrollView
+        android:id="@+id/reportContent"
         android:layout_marginTop="@dimen/_20sdp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

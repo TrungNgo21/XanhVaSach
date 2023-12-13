@@ -4,11 +4,13 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -27,14 +29,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,6 +53,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -76,7 +86,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MapSiteFragment extends Fragment
-    implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
+    implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener, LocationListener {
 
   private FragmentMapSiteBinding fragmentMapSiteBinding;
 
@@ -107,9 +117,9 @@ public class MapSiteFragment extends Fragment
 
   private List<PolylineInfo> polylineInfoList = new ArrayList<>();
   private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-  private static final int LOCATION_INTERVAL = 100;
+  private static final int LOCATION_INTERVAL = 3000;
 
-  private static final int LOCATION_FASTEST_INTERVAL = 3000;
+  private static final int LOCATION_FASTEST_INTERVAL = 1000;
   private static final int LOCATION_MAX_WAIT_TIME = 100;
 
   private Handler handler;
@@ -121,7 +131,7 @@ public class MapSiteFragment extends Fragment
     SupportMapFragment mapFragment =
         (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
     mapFragment.getMapAsync(this);
-
+    //    checkAndRequestLocationPermission();
     return fragmentMapSiteBinding.getRoot();
   }
 
@@ -133,7 +143,6 @@ public class MapSiteFragment extends Fragment
     userService = new UserService(requireContext());
     currentUser = userService.getCurrentUser();
     //    getLastLocation();
-    fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
     siteService.getAllSite(
         currentUser.getId(),
         new FirebaseCallback<Result<List<SiteDto>>>() {
@@ -151,32 +160,39 @@ public class MapSiteFragment extends Fragment
           }
         });
 
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
     locationRequest =
-        new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_INTERVAL)
-            .setWaitForAccurateLocation(false)
+        new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY)
+            .setIntervalMillis(LOCATION_INTERVAL)
             .setMinUpdateIntervalMillis(LOCATION_FASTEST_INTERVAL)
             .setMaxUpdateDelayMillis(LOCATION_MAX_WAIT_TIME)
+            .setWaitForAccurateLocation(true)
             .build();
+
+    //    LocationSettingsRequest.Builder builder =
+    //        new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+    //    SettingsClient client = LocationServices.getSettingsClient(requireContext());
+    //    Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
     // Create a location callback
     locationCallback =
         new LocationCallback() {
           @Override
-          public void onLocationResult(LocationResult locationResult) {
-            if (locationResult == null) {
-              return;
-            }
+          public void onLocationResult(@NonNull LocationResult locationResult) {
             for (Location location : locationResult.getLocations()) {
-              // Handle the location update
-              double latitude = location.getLatitude();
-              double longitude = location.getLongitude();
-              // Do something with the latitude and longitude
-
+              Log.d("updated location:", String.valueOf(location.getLatitude()));
+              Log.d("updated location:", String.valueOf(location.getLongitude()));
+              //              if (currentUser.getLatitude() != location.getLatitude()) {
+              //                setSiteMarkers(map, sites);
+              //              }
             }
+            super.onLocationResult(locationResult);
+            //            getLastLocation();
           }
         };
 
-    getLastLocation();
+    //    checkAndRequestLocationPermission();
+    //    getLastLocation();
   }
 
   @Override
@@ -188,7 +204,12 @@ public class MapSiteFragment extends Fragment
   @Override
   public void onResume() {
     super.onResume();
-    getLastLocation();
+    //    checkAndRequestLocationPermission();
+    startLocationUpdates();
+
+    //    if (customManager != null) {
+    //      setUserMarker(customManager);
+    //    }
     if (handler != null) {
       handler.postDelayed(runnable, 3000);
     }
@@ -203,20 +224,6 @@ public class MapSiteFragment extends Fragment
     }
   }
 
-  private boolean isGPSAllowed() {
-    if (ActivityCompat.checkSelfPermission(
-                requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        && ActivityCompat.checkSelfPermission(
-                requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-      return true;
-    } else {
-      requestLocationPermission();
-      return false;
-    }
-  }
-
   private void checkAndRequestLocationPermission() {
     if (ActivityCompat.checkSelfPermission(
                 requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -224,7 +231,6 @@ public class MapSiteFragment extends Fragment
         && ActivityCompat.checkSelfPermission(
                 requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
-      getLastLocation();
       startLocationUpdates();
     } else {
       requestLocationPermission();
@@ -240,6 +246,10 @@ public class MapSiteFragment extends Fragment
               isAllowedAccessLocation = true;
               startLocationUpdates();
             } else {
+              Toast.makeText(
+                  requireContext(),
+                  "Please turn on GPS permission otherwise you can not use map features",
+                  Toast.LENGTH_SHORT);
               isAllowedAccessLocation = false;
               // Permission denied; handle accordingly (e.g., show a message, disable location
               // features)
@@ -295,7 +305,6 @@ public class MapSiteFragment extends Fragment
         && ActivityCompat.checkSelfPermission(
                 requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
-
       return;
     }
     fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
@@ -308,6 +317,18 @@ public class MapSiteFragment extends Fragment
   private void requestLocationPermission() {
     requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
   }
+
+  //  private void setUserMarker(ClusterManager<CustomMarker> customManager) {
+  //    customManager.addItem(
+  //        CustomMarker.builder()
+  //            .site(null)
+  //            .iconPic(R.drawable.location_icon)
+  //            .title(currentUser.getDisplayName())
+  //            .snippet(currentUser.getEmail())
+  //            .position(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()))
+  //            .build());
+  //    customManager.cluster();
+  //  }
 
   private void setSiteMarkers(GoogleMap googleMap, List<SiteDto> sites) {
     if (customManager == null) {
@@ -420,6 +441,7 @@ public class MapSiteFragment extends Fragment
     if (mGeoApiContext == null) {
       mGeoApiContext = new GeoApiContext.Builder().apiKey(Constant.KEY_GOOGLE_MAP_API).build();
     }
+    //    if (customManager != null) setUserMarker(customManager);
     map.setOnPolylineClickListener(this);
   }
 
@@ -563,5 +585,12 @@ public class MapSiteFragment extends Fragment
         polylineData.getPolyline().setZIndex(0);
       }
     }
+  }
+
+  @Override
+  public void onLocationChanged(@NonNull Location location) {
+    currentUser.setLatitude(location.getLatitude());
+    currentUser.setLongitude(location.getLongitude());
+    getLastLocation();
   }
 }

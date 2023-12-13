@@ -13,6 +13,7 @@ import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.Report;
 import com.trungngo.xanhandsach.Model.Site;
+import com.trungngo.xanhandsach.Model.User;
 import com.trungngo.xanhandsach.Shared.Constant;
 import com.trungngo.xanhandsach.Shared.PreferenceManager;
 import com.trungngo.xanhandsach.Shared.Result;
@@ -120,6 +121,23 @@ public class SiteService {
                 callback.callbackRes(new Result.Success<>(updatedSite));
               } else {
                 callback.callbackRes(new Result.Error(task.getException()));
+              }
+            });
+  }
+
+  public void updateSiteVolunteers(
+      String siteId,
+      List<UserDto> volunteers,
+      final FirebaseCallback<Result<List<UserDto>>> callback) {
+    siteReference
+        .document(siteId)
+        .update("volunteers", volunteers)
+        .addOnCompleteListener(
+            updateTask -> {
+              if (updateTask.isSuccessful()) {
+                callback.callbackRes(new Result.Success<List<UserDto>>(volunteers));
+              } else {
+                callback.callbackRes(new Result.Error(updateTask.getException()));
               }
             });
   }

@@ -52,6 +52,7 @@ import com.squareup.picasso.Picasso;
 import com.trungngo.xanhandsach.Adapter.ImageAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
+import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.ImageService;
@@ -108,7 +109,6 @@ public class CreateSiteFragment extends Fragment
     if (userService.getCurrentUser().getSiteId() != null) {
       ownerSetUp();
     } else {
-
       initialSetup();
     }
     setUpButtonPressed();
@@ -117,7 +117,7 @@ public class CreateSiteFragment extends Fragment
   }
 
   private void initialSetup() {
-    fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
+    //    fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
     setErrorMess(fragmentCreateSiteBinding.siteDesErr, false);
     setErrorMess(fragmentCreateSiteBinding.siteNameErr, false);
     setErrorMess(fragmentCreateSiteBinding.maxVolunErr, false);
@@ -242,6 +242,7 @@ public class CreateSiteFragment extends Fragment
                     public void callbackRes(Result<Site> siteResult) {
                       if (siteResult instanceof Result.Success) {
                         Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+
                       } else {
                         Toast.makeText(requireContext(), "Error!", Toast.LENGTH_SHORT).show();
                       }
@@ -301,6 +302,7 @@ public class CreateSiteFragment extends Fragment
                                         Toast.makeText(
                                                 requireContext(), "Successful!", Toast.LENGTH_SHORT)
                                             .show();
+
                                         setEnabledUi(true);
                                         setIsLoading(false);
                                       } else {
@@ -341,6 +343,9 @@ public class CreateSiteFragment extends Fragment
                 Site site = ((Result.Success<Site>) siteResult).getData();
                 if (uriList.isEmpty()) {
                   Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+                  UserDto currentUser = userService.getCurrentUser();
+                  currentUser.setSiteId(createdSite.getId());
+                  userService.setCurrentUser(currentUser);
                   setEnabledUi(true);
                   setIsLoading(false);
                 }
@@ -477,10 +482,10 @@ public class CreateSiteFragment extends Fragment
     AutocompleteSupportFragment autocompleteSupportFragment =
         (AutocompleteSupportFragment)
             getChildFragmentManager().findFragmentById(R.id.autoCompleteAddress);
+    //    AutocompleteSessionToken.newInstance();
     autocompleteSupportFragment.setActivityMode(AutocompleteActivityMode.FULLSCREEN);
     autocompleteSupportFragment.setPlaceFields(
         asList(Place.Field.LAT_LNG, Place.Field.ADDRESS, Place.Field.NAME));
-    AutocompleteSessionToken.newInstance();
 
     autocompleteSupportFragment.setOnPlaceSelectedListener(
         new PlaceSelectionListener() {

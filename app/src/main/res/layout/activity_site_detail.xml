@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--    tools:openDrawer="start"-->
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
@@ -55,6 +55,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/pleaseHelpText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -238,6 +239,63 @@
                         android:layout_height="wrap_content"
                         style="@style/GeneralInfoNormal1"
                         android:text="Please help Kien clean his fucking house..." />
+
+                    <LinearLayout
+                        android:id="@+id/volunteerSection"
+                        android:visibility="gone"
+                        android:orientation="vertical"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:layout_marginBottom="@dimen/_3sdp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:scaleType="centerCrop"
+                                app:tint="@color/primary_dark"
+                                android:src="@drawable/volunteers" />
+
+                            <TextView
+                                android:gravity="center_vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                style="@style/GeneralInfoNormal1"
+                                android:textStyle="bold"
+                                android:text="Volunteers:" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/listVolunteer"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <LinearLayout
+                            android:id="@+id/noVolunteer"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/_100sdp"
+                                android:src="@drawable/volunteer_photo" />
+
+                            <TextView
+                                android:gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                style="@style/GeneralCardHeading2"
+                                android:text="No one has signed up to your site yet!" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <ViewStub
                         android:id="@+id/stub_map"

@@ -1,6 +1,7 @@
 package com.trungngo.xanhandsach.Fragment;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -11,7 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+import com.trungngo.xanhandsach.Activity.AddSiteActivity;
 import com.trungngo.xanhandsach.Activity.SiteDetailActivity;
 import com.trungngo.xanhandsach.Adapter.SiteAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
@@ -22,9 +28,14 @@ import com.trungngo.xanhandsach.Service.SiteService;
 import com.trungngo.xanhandsach.Service.UserService;
 import com.trungngo.xanhandsach.Shared.Constant;
 import com.trungngo.xanhandsach.Shared.Result;
+import com.trungngo.xanhandsach.Shared.SeverityChipHandler;
 import com.trungngo.xanhandsach.databinding.FragmentGeneralSiteBinding;
+import com.trungngo.xanhandsach.databinding.SiteDetailGeneralBinding;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteSelected {
 
@@ -45,6 +56,29 @@ public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteS
     UserDto currentUser = userService.getCurrentUser();
     fragmentGeneralSiteBinding.listSite.setLayoutManager(new LinearLayoutManager(getContext()));
     setUpShimmer(true);
+
+    if (userService.getCurrentUser().getSiteId() == null) {
+      fragmentGeneralSiteBinding.mySite.setVisibility(View.VISIBLE);
+      getYourOwnSite(null, null);
+    } else {
+      siteService.getOneSite(
+          userService.getCurrentUser().getSiteId(),
+          new FirebaseCallback<Result<SiteDto>>() {
+            @Override
+            public void callbackListRes(List<Result<SiteDto>> listT) {}
+
+            @Override
+            public void callbackRes(Result<SiteDto> siteDtoResult) {
+              if (siteDtoResult instanceof Result.Success) {
+                fragmentGeneralSiteBinding.mySite.setVisibility(View.VISIBLE);
+                fragmentGeneralSiteBinding.notHaveSite.setVisibility(View.GONE);
+                SiteDto siteDto = ((Result.Success<SiteDto>) siteDtoResult).getData();
+                getYourOwnSite(userService.getCurrentUser().getSiteId(), siteDto);
+              }
+            }
+          });
+    }
+
     siteService.getAllSite(
         currentUser.getId(),
         new FirebaseCallback<Result<List<SiteDto>>>() {
@@ -83,6 +117,64 @@ public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteS
     } else {
       fragmentGeneralSiteBinding.shimmerView.stopShimmer();
       fragmentGeneralSiteBinding.shimmerView.setVisibility(View.INVISIBLE);
+    }
+  }
+
+  private void getYourOwnSite(String siteId, SiteDto siteDto) {
+    fragmentGeneralSiteBinding.notHaveSite.setVisibility(View.GONE);
+
+    fragmentGeneralSiteBinding.toCreateSite.setOnClickListener(
+        view -> {
+          startActivity(new Intent(requireContext(), AddSiteActivity.class));
+        });
+
+    if (siteId != null) {
+      ImageView siteImage;
+      TextView siteName;
+      TextView siteAddress;
+      TextView ownerName;
+      TextView siteDate;
+      TextView maxVolun;
+      TextView signUpVolun;
+      View severityChip;
+      LinearLayout layout =
+          (LinearLayout)
+              LayoutInflater.from(requireContext()).inflate(R.layout.site_detail_general, null);
+      layout.setLayoutParams(
+          new ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      fragmentGeneralSiteBinding.mySiteDetail.addView(layout);
+      siteImage = layout.findViewById(R.id.siteImgId);
+      siteName = layout.findViewById(R.id.siteNameId);
+      siteAddress = layout.findViewById(R.id.siteAddressId);
+      ownerName = layout.findViewById(R.id.ownerId);
+      siteDate = layout.findViewById(R.id.createdDateId);
+      maxVolun = layout.findViewById(R.id.maximumCapacityId);
+      signUpVolun = layout.findViewById(R.id.signUpNumId);
+      severityChip = layout.findViewById(R.id.severityChip);
+      List<String> imageUrls = siteDto.getImageUrl();
+      if (siteDto.getImageUrl().isEmpty()) {
+        imageUrls = new ArrayList<>(Collections.singletonList(Constant.NO_IMG_DEFAULT));
+      }
+      Picasso.get()
+          .load(Uri.parse(imageUrls.get(0)))
+          .placeholder(R.drawable.bg_main)
+          .into(siteImage);
+      siteName.setText(siteDto.getDisplayName());
+      siteAddress.setText(siteDto.getAddress());
+      siteDate.setText(siteDto.getUpdatedDate());
+      ownerName.setText(siteDto.getOwner().getEmail());
+      maxVolun.setText(String.valueOf(siteDto.getMaxCapacity()));
+      signUpVolun.setText(String.valueOf(siteDto.getVolunteers().size()));
+      SeverityChipHandler.chipDirective(siteDto.getSeverity(), severityChip, layout.getContext());
+      fragmentGeneralSiteBinding.mySiteDetail.setOnClickListener(
+          view -> {
+            Intent intent = new Intent(requireContext(), SiteDetailActivity.class);
+            intent.putExtra(Constant.KEY_SITE_ID, siteId);
+            startActivity(intent);
+          });
+    } else {
+      fragmentGeneralSiteBinding.notHaveSite.setVisibility(View.VISIBLE);
     }
   }
 

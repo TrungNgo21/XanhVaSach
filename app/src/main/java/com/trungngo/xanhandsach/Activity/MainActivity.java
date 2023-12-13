@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(MainActivity.this, SignInActivity.class);
               userService.signOut();
+              finish();
               startActivity(intent);
             }
             return false;

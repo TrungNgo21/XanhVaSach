@@ -5,83 +5,143 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Fragment.GeneralSiteFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/listSite"
+    <LinearLayout
+        android:paddingHorizontal="@dimen/_2sdp"
+        android:orientation="vertical"
+        android:id="@+id/mySite"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:layout_height="wrap_content">
 
-    <com.facebook.shimmer.ShimmerFrameLayout
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This is your site"
+            style="@style/GeneralCardHeading" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/mySiteDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/notHaveSite"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/GeneralInfoNormal1"
+                android:text="You do not have a site! Create one?" />
+
+            <Button
+                android:id="@+id/toCreateSite"
+                android:backgroundTint="@color/primary_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To create site" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_below="@+id/mySite"
+
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/shimmerView">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/othersSiteTitle"
+            android:paddingHorizontal="@dimen/_2sdp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:text="Other site"
+            style="@style/GeneralCardHeading" />
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="@dimen/_60sdp"
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_below="@+id/othersSiteTitle"
+            android:id="@+id/listSite"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" />
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="@dimen/_120sdp"
-
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_below="@+id/listSite"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:id="@+id/shimmerView">
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_marginTop="@dimen/_180sdp"
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_marginTop="@dimen/_60sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_marginTop="@dimen/_240sdp"
+            <LinearLayout
+                android:layout_marginTop="@dimen/_120sdp"
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_marginTop="@dimen/_300sdp"
+            <LinearLayout
+                android:layout_marginTop="@dimen/_180sdp"
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_marginTop="@dimen/_360sdp"
+            <LinearLayout
+                android:layout_marginTop="@dimen/_240sdp"
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_marginTop="@dimen/_420sdp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_marginTop="@dimen/_300sdp"
 
-            <include layout="@layout/shimmer_layout_main" />
-        </LinearLayout>
-    </com.facebook.shimmer.ShimmerFrameLayout>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="@dimen/_360sdp"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="@dimen/_420sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/shimmer_layout_main" />
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+    </RelativeLayout>
+
 
 </RelativeLayout>

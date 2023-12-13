@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.DrawableRes;
@@ -26,6 +27,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,8 +43,10 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.navigation.NavigationView;
 import com.trungngo.xanhandsach.Adapter.SiteAdapter;
 import com.trungngo.xanhandsach.Adapter.SliderAdapter;
+import com.trungngo.xanhandsach.Adapter.VolunteerAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
+import com.trungngo.xanhandsach.Model.Notification;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
 import com.trungngo.xanhandsach.Service.UserService;
@@ -66,6 +70,8 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
 
   private List<String> images;
 
+  private SiteDto siteDetail;
+
   private UserService userService;
 
   private GoogleMap map;
@@ -87,13 +93,15 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     siteDetailBinding = ActivitySiteDetailBinding.inflate(getLayoutInflater());
     setContentView(siteDetailBinding.getRoot());
     siteService = new SiteService(this);
-    userService = new UserService(this);
+    userService = new UserService(this, siteService);
+    setButtonListener();
     setUpGuestPerspective();
     setUpDrawer();
   }
 
   private void setUpGuestPerspective() {
     String siteId = getIntent().getStringExtra(Constant.KEY_SITE_ID);
+
     siteDetailBinding.progressBarHolder.setVisibility(View.VISIBLE);
     siteService.getOneSite(
         siteId,
@@ -107,12 +115,30 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             if (siteDtoResult instanceof Result.Success) {
               View chipView = siteDetailBinding.severityChip.getRoot();
               SiteDto getSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
+              siteDetail = getSite;
+              if (userService.getCurrentUser().getSiteId().equals(getSite.getId())) {
+                if (getSite.getVolunteers() == null || getSite.getVolunteers().isEmpty()) {
+                  siteDetailBinding.volunteerSection.setVisibility(View.VISIBLE);
+                  siteDetailBinding.noVolunteer.setVisibility(View.VISIBLE);
+                } else {
+                  siteDetailBinding.volunteerSection.setVisibility(View.VISIBLE);
+
+                  siteDetailBinding.noVolunteer.setVisibility(View.GONE);
+                  siteDetailBinding.listVolunteer.setVisibility(View.VISIBLE);
+                  VolunteerAdapter volunteerAdapter = new VolunteerAdapter(SiteDetailActivity.this);
+                  volunteerAdapter.setData(getSite.getVolunteers());
+                  siteDetailBinding.listVolunteer.setLayoutManager(
+                      new LinearLayoutManager(getApplicationContext()));
+                  siteDetailBinding.listVolunteer.setAdapter(volunteerAdapter);
+                }
+              }
               siteDetailBinding.siteAddress.setText(getSite.getAddress());
               siteDetailBinding.createdDate.setText(getSite.getCreatedDate());
               siteDetailBinding.siteOwnerEmail.setText(getSite.getOwner().getEmail());
               siteDetailBinding.siteOwner.setText(getSite.getOwner().getDisplayName());
               siteDetailBinding.siteName.setText(getSite.getDisplayName());
               siteDetailBinding.siteDes.setText(getSite.getDescription());
+
               SeverityChipHandler.chipDirective(
                   getSite.getSeverity(), chipView, SiteDetailActivity.this);
               coordinates = new LatLng(getSite.getLatitude(), getSite.getLongitude());
@@ -135,6 +161,62 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             }
           }
         });
+  }
+
+  //  @Override
+  //  protected void onRestart() {
+  //    super.onRestart();
+  //    setUpGuestPerspective();
+  //  }
+
+  private void setButtonListener() {
+    String siteId = getIntent().getStringExtra(Constant.KEY_SITE_ID);
+    if (siteId.equals(userService.getCurrentUser().getSiteId())) {
+      //      if (siteId == userService.getCurrentUser().getSiteId()) {
+      //      }
+      siteDetailBinding.pleaseHelpText.setVisibility(View.GONE);
+      siteDetailBinding.submitButton.setText("Update site");
+      siteDetailBinding.submitButton.setOnClickListener(
+          view -> {
+            finish();
+            startActivity(new Intent(SiteDetailActivity.this, AddSiteActivity.class));
+          });
+    } else {
+      siteDetailBinding.submitButton.setOnClickListener(
+          view -> {
+            userService.applyForVolunteer(
+                siteDetail,
+                new FirebaseCallback<Result<SiteDto>>() {
+                  @Override
+                  public void callbackListRes(List<Result<SiteDto>> listT) {}
+
+                  @Override
+                  public void callbackRes(Result<SiteDto> siteDtoResult) {
+                    if (siteDtoResult instanceof Result.Success) {
+                      Toast.makeText(
+                              SiteDetailActivity.this, "Apply successfully!", Toast.LENGTH_SHORT)
+                          .show();
+                      Notification notification =
+                          Notification.builder()
+                              .title("Dear, " + siteDetail.getOwner().getDisplayName())
+                              .body(
+                                  userService.getCurrentUser().getDisplayName()
+                                      + " has just volunteered to clean your site!\n"
+                                      + "Say hi!!!")
+                              .fcmToken(siteDetail.getOwner().getFcmToken())
+                              .build();
+                      List<Notification> notifications = new ArrayList<>();
+                      notifications.add(notification);
+                      userService.sendNotification(notifications);
+                    } else {
+                      Toast.makeText(
+                              SiteDetailActivity.this, "Something wrong!", Toast.LENGTH_SHORT)
+                          .show();
+                    }
+                  }
+                });
+          });
+    }
   }
 
   private void setUpSlider(List<String> images) {
@@ -286,6 +368,8 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(SiteDetailActivity.this, SignInActivity.class);
               userService.signOut();
+              finish();
+
               startActivity(intent);
             }
             return false;

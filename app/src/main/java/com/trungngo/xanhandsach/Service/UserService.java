@@ -1,8 +1,11 @@
 package com.trungngo.xanhandsach.Service;
 
+import static java.util.Arrays.asList;
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -27,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -45,7 +49,14 @@ public class UserService {
   public static final MediaType JSON = MediaType.get("application/json");
   private static final String url = "https://fcm.googleapis.com/fcm/send";
 
+  private SiteService siteService;
+
   private PreferenceManager preferenceManager;
+
+  public UserService(Context context, SiteService siteService) {
+    this.preferenceManager = new PreferenceManager(context.getApplicationContext());
+    this.siteService = siteService;
+  }
 
   public UserService(Context context) {
     this.preferenceManager = new PreferenceManager(context.getApplicationContext());
@@ -172,17 +183,17 @@ public class UserService {
 
   public void signOut() {
     preferenceManager.clear();
-    FirebaseMessaging.getInstance()
-        .deleteToken()
-        .addOnCompleteListener(
-            deleteTask -> {
-              if (deleteTask.isSuccessful()) {
-                Log.d("FCM", "delete successfully!");
-              } else {
-
-                Log.d("FCM", deleteTask.getException().toString());
-              }
-            });
+    //    FirebaseMessaging.getInstance()
+    //        .deleteToken()
+    //        .addOnCompleteListener(
+    //            deleteTask -> {
+    //              if (deleteTask.isSuccessful()) {
+    //                Log.d("FCM", "delete successfully!");
+    //              } else {
+    //
+    //                Log.d("FCM", deleteTask.getException().toString());
+    //              }
+    //            });
   }
 
   public boolean getLogInStatus() {
@@ -263,7 +274,25 @@ public class UserService {
             });
   }
 
-  public void applyForVolunteer(SiteDto site) {}
+  public void applyForVolunteer(SiteDto site, final FirebaseCallback<Result<SiteDto>> callback) {
+    site.setVolunteers(new ArrayList<>(asList(getCurrentUser())));
+    siteService.updateSiteVolunteers(
+        site.getId(),
+        site.getVolunteers(),
+        new FirebaseCallback<Result<List<UserDto>>>() {
+          @Override
+          public void callbackListRes(List<Result<List<UserDto>>> listT) {}
+
+          @Override
+          public void callbackRes(Result<List<UserDto>> listResult) {
+            if (listResult instanceof Result.Success) {
+              callback.callbackRes(new Result.Success<>(site));
+            } else {
+              callback.callbackRes(new Result.Error(new Exception("cannot apply")));
+            }
+          }
+        });
+  }
 
   public void sendNotification(List<Notification> notifications) {
     for (Notification notification : notifications) {
@@ -294,16 +323,15 @@ public class UserService {
             .post(body)
             .header("Authorization", "Bearer " + Constant.KEY_SERVER_MESSAGE)
             .build();
-    client
-        .newCall(request)
-        .enqueue(
-            new Callback() {
-              @Override
-              public void onFailure(@NonNull Call call, @NonNull IOException e) {}
-
-              @Override
-              public void onResponse(@NonNull Call call, @NonNull Response response)
-                  throws IOException {}
-            });
+    client.newCall(request);
+    //        .enqueue(
+    //            new Callback() {
+    //              @Override
+    //              public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+    //
+    //              @Override
+    //              public void onResponse(@NonNull Call call, @NonNull Response response)
+    //                  throws IOException {}
+    //            });
   }
 }

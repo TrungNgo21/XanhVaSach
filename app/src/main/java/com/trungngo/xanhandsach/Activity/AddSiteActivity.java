@@ -123,11 +123,21 @@ public class AddSiteActivity extends AppCompatActivity {
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(AddSiteActivity.this, SignInActivity.class);
               userService.signOut();
+              finish();
+
               startActivity(intent);
             }
             return false;
           }
         });
+  }
+
+  public void switchToPage(int pageIndex) {
+    if (activityAddSiteBinding.pageContent != null
+        && pageIndex >= 0
+        && pageIndex < activityAddSiteBinding.pageContent.getAdapter().getItemCount()) {
+      activityAddSiteBinding.pageContent.setCurrentItem(pageIndex);
+    }
   }
 
   @Override

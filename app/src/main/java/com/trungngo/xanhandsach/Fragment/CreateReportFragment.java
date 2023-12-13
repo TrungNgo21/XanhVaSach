@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.trungngo.xanhandsach.Activity.AddSiteActivity;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Model.Report;
 import com.trungngo.xanhandsach.R;
@@ -49,8 +52,27 @@ public class CreateReportFragment extends Fragment {
     fragmentReportBinding.wasteAmount.addTextChangedListener(onInputListener());
     siteService = new SiteService(requireContext());
     userService = new UserService(requireContext());
+    initialViewSetup();
     initialSetUp();
     setUpDatePicker();
+  }
+
+  private void initialViewSetup() {
+    if (userService.getCurrentUser().getSiteId() == null) {
+      fragmentReportBinding.reportContent.setVisibility(View.GONE);
+      fragmentReportBinding.notHaveSite.setVisibility(View.VISIBLE);
+      fragmentReportBinding.toCreateSite.setOnClickListener(
+          view -> {
+            if (getActivity() instanceof AddSiteActivity) {
+              ((AddSiteActivity) getActivity())
+                  .switchToPage(0); // Replace 1 with the index of the desired page
+            }
+          });
+
+    } else {
+      fragmentReportBinding.reportContent.setVisibility(View.VISIBLE);
+      fragmentReportBinding.notHaveSite.setVisibility(View.GONE);
+    }
   }
 
   private void initialSetUp() {
@@ -89,6 +111,14 @@ public class CreateReportFragment extends Fragment {
           datePickerDialog.show();
         });
 
+    fragmentReportBinding.viewReportsButton.setOnClickListener(
+        view -> {
+          if (getActivity() instanceof AddSiteActivity) {
+            ((AddSiteActivity) getActivity())
+                .switchToPage(2); // Replace 1 with the index of the desired page
+          }
+        });
+
     fragmentReportBinding.createReportButton.setOnClickListener(
         view -> {
           setIsLoading(true);
@@ -108,6 +138,10 @@ public class CreateReportFragment extends Fragment {
                     Toast.makeText(
                             requireContext(), "Add report successfully !", Toast.LENGTH_SHORT)
                         .show();
+                    if (getActivity() instanceof AddSiteActivity) {
+                      ((AddSiteActivity) getActivity())
+                          .switchToPage(2); // Replace 1 with the index of the desired page
+                    }
 
                     setIsLoading(false);
                   } else {
