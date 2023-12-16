@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/input_field"
+    android:layout_marginVertical="@dimen/_4sdp"
+    android:paddingHorizontal="@dimen/_4sdp"
+    android:paddingVertical="@dimen/_2sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/notiTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dear, TrungNgo "
+            style="@style/GeneralCardHeading2" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/notiContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_10sdp"
+            style="@style/GeneralInfoNormal"
+            android:text="asdfjksajfkjasdfkljsadklfjsakldfjklsdaf" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="@dimen/_12sdp"
+            android:layout_height="@dimen/_12sdp"
+            android:src="@drawable/date_icon"
+            app:tint="@color/primary_dark"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GeneralInfoNormalHeading"
+            android:text="Date: " />
+
+        <TextView
+            android:id="@+id/createdDate"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GeneralInfoNormal"
+            android:text="20/12/2022 " />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_gravity="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/toRequestBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_30sdp"
+            android:textSize="@dimen/_8sdp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_dark"
+            android:layout_marginHorizontal="@dimen/_4sdp"
+            android:text="to Request" />
+
+        <Button
+            android:id="@+id/deleteBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_30sdp"
+            android:textSize="@dimen/_8sdp"
+            android:textStyle="bold"
+            android:layout_marginHorizontal="@dimen/_4sdp"
+            android:backgroundTint="@color/error"
+            android:text="delete" />
+    </LinearLayout>
+
+</LinearLayout>

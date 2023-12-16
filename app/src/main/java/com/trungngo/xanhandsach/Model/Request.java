@@ -1,7 +1,8 @@
 package com.trungngo.xanhandsach.Model;
 
+import com.trungngo.xanhandsach.Dto.UserDto;
+
 import java.util.Date;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,10 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Notification {
-  private String title;
-  private String body;
-  private String fcmToken;
-
-  private Date createdDate;
+public class Request {
+  private UserDto volunteers;
+  private Date sentDate;
 }

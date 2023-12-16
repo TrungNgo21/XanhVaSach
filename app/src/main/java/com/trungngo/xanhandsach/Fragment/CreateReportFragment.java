@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,9 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.trungngo.xanhandsach.Activity.AddSiteActivity;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
+import com.trungngo.xanhandsach.Dto.SiteDto;
+import com.trungngo.xanhandsach.Dto.UserDto;
+import com.trungngo.xanhandsach.Model.Notification;
 import com.trungngo.xanhandsach.Model.Report;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
@@ -32,6 +36,7 @@ import com.trungngo.xanhandsach.databinding.FragmentReportBinding;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 
@@ -42,6 +47,8 @@ public class CreateReportFragment extends Fragment {
   private SiteService siteService;
 
   private UserService userService;
+
+  private SiteDto siteDto;
 
   private Report report = Report.builder().build();
 
@@ -76,6 +83,29 @@ public class CreateReportFragment extends Fragment {
   }
 
   private void initialSetUp() {
+    String siteId;
+    if (siteService.getCacheSiteId() != null) {
+      siteId = siteService.getCacheSiteId();
+    } else {
+      siteId = userService.getCurrentUser().getSiteId();
+    }
+    siteService.getOneSite(
+        siteId,
+        new FirebaseCallback<Result<SiteDto>>() {
+          @Override
+          public void callbackListRes(List<Result<SiteDto>> listT) {}
+
+          @Override
+          public void callbackRes(Result<SiteDto> siteDtoResult) {
+            if (siteDtoResult instanceof Result.Success) {
+              SiteDto currentSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
+              siteDto = currentSite;
+            } else {
+              Log.d("Error getting site:", siteDtoResult.toString());
+            }
+          }
+        });
+
     fragmentReportBinding.selectedDate.setText(DateFormatter.toDateString(new Date()));
     report.setCreatedDate(new Date());
   }
@@ -93,14 +123,14 @@ public class CreateReportFragment extends Fragment {
           Calendar calendar = Calendar.getInstance();
           int day = calendar.get(Calendar.DAY_OF_MONTH);
           int month = calendar.get(Calendar.MONTH);
-          int year = calendar.get(calendar.YEAR);
+          int year = calendar.get(Calendar.YEAR);
           DatePickerDialog datePickerDialog =
               new DatePickerDialog(
                   requireContext(),
                   new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                      Date date = new Date(year, month + 1, dayOfMonth);
+                      Date date = new GregorianCalendar(year, month, dayOfMonth).getTime();
                       report.setCreatedDate(date);
                       fragmentReportBinding.selectedDate.setText(DateFormatter.toDateString(date));
                     }
@@ -121,36 +151,85 @@ public class CreateReportFragment extends Fragment {
 
     fragmentReportBinding.createReportButton.setOnClickListener(
         view -> {
-          setIsLoading(true);
-          report.setContent(fragmentReportBinding.description.getText().toString());
-          report.setAmount(
-              Double.parseDouble(fragmentReportBinding.wasteAmount.getText().toString()));
-          siteService.updateSiteReports(
-              userService.getCurrentUser().getSiteId(),
-              report,
-              new FirebaseCallback<Result<Report>>() {
-                @Override
-                public void callbackListRes(List<Result<Report>> listT) {}
+          if (fragmentReportBinding.wasteAmount.getText().toString().isEmpty()) {
+            Toast.makeText(requireContext(), "You must enter your amount!", Toast.LENGTH_SHORT)
+                .show();
+          } else if (fragmentReportBinding.description.getText().toString().isEmpty()) {
+            Toast.makeText(
+                    requireContext(), "You must enter your report content!", Toast.LENGTH_SHORT)
+                .show();
 
-                @Override
-                public void callbackRes(Result<Report> reportResult) {
-                  if (reportResult instanceof Result.Success) {
-                    Toast.makeText(
-                            requireContext(), "Add report successfully !", Toast.LENGTH_SHORT)
-                        .show();
-                    if (getActivity() instanceof AddSiteActivity) {
-                      ((AddSiteActivity) getActivity())
-                          .switchToPage(2); // Replace 1 with the index of the desired page
+          } else {
+            setIsLoading(true);
+            report.setContent(fragmentReportBinding.description.getText().toString());
+            report.setAmount(
+                Double.parseDouble(fragmentReportBinding.wasteAmount.getText().toString()));
+            String siteId = "";
+            if (userService.getCurrentUser().getPermission().equals("super")) {
+              siteId = siteDto.getId();
+            } else {
+              siteId = userService.getCurrentUser().getSiteId();
+            }
+            siteService.updateSiteReports(
+                siteId,
+                report,
+                new FirebaseCallback<Result<Report>>() {
+                  @Override
+                  public void callbackListRes(List<Result<Report>> listT) {}
+
+                  @Override
+                  public void callbackRes(Result<Report> reportResult) {
+                    if (reportResult instanceof Result.Success) {
+                      Toast.makeText(
+                              requireContext(), "Add report successfully !", Toast.LENGTH_SHORT)
+                          .show();
+                      if (getTotalWaste(siteDto) + report.getAmount() > 10000) {
+                        if (siteDto.getVolunteers() != null) {
+
+                          for (UserDto userDto : siteDto.getVolunteers()) {
+                            Notification notification =
+                                Notification.builder()
+                                    .createdDate(new Date())
+                                    .title("Dear " + userDto.getDisplayName())
+                                    .body(
+                                        "Thanks for your effort our site has collected "
+                                            + getTotalWaste(siteDto)
+                                            + " kg of waste")
+                                    .build();
+                            userService.sendNotification(
+                                notification,
+                                userDto.getId(),
+                                new FirebaseCallback<Result<Notification>>() {
+                                  @Override
+                                  public void callbackListRes(List<Result<Notification>> listT) {}
+
+                                  @Override
+                                  public void callbackRes(Result<Notification> notificationResult) {
+                                    if (notificationResult instanceof Result.Success) {
+                                      Log.d("Report sent: ", "Success");
+                                    } else {
+
+                                      Log.d("Report sent: ", "Failed");
+                                    }
+                                  }
+                                });
+                          }
+                        }
+                      }
+                      if (getActivity() instanceof AddSiteActivity) {
+                        ((AddSiteActivity) getActivity())
+                            .switchToPage(2); // Replace 1 with the index of the desired page
+                      }
+
+                      setIsLoading(false);
+                    } else {
+                      Toast.makeText(requireContext(), reportResult.toString(), Toast.LENGTH_SHORT)
+                          .show();
+                      setIsLoading(false);
                     }
-
-                    setIsLoading(false);
-                  } else {
-                    Toast.makeText(requireContext(), reportResult.toString(), Toast.LENGTH_SHORT)
-                        .show();
-                    setIsLoading(false);
                   }
-                }
-              });
+                });
+          }
         });
   }
 
@@ -251,6 +330,10 @@ public class CreateReportFragment extends Fragment {
         }
       }
     };
+  }
+
+  private Double getTotalWaste(SiteDto siteDto) {
+    return siteDto.getReports().stream().map(Report::getAmount).reduce(0D, Double::sum);
   }
 
   @Override

@@ -115,10 +115,13 @@ public class AddSiteActivity extends AppCompatActivity {
             } else if (menuItem.getItemId() == R.id.nav_site) {
               return false;
             } else if (menuItem.getItemId() == R.id.nav_chat) {
-              Intent intent = new Intent(AddSiteActivity.this, MainActivity.class);
+              Intent intent = new Intent(AddSiteActivity.this, ViewRequestActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
-              Intent intent = new Intent(AddSiteActivity.this, MainActivity.class);
+              Intent intent = new Intent(AddSiteActivity.this, AboutUsActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_noti) {
+              Intent intent = new Intent(AddSiteActivity.this, NotificationActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(AddSiteActivity.this, SignInActivity.class);

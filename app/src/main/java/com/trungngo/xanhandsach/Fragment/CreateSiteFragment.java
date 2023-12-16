@@ -106,7 +106,8 @@ public class CreateSiteFragment extends Fragment
     imageAdapter = new ImageAdapter(requireContext(), this, this);
     imageAdapter.setData(uriList);
     fragmentCreateSiteBinding.imagesSelectedId.setAdapter(imageAdapter);
-    if (userService.getCurrentUser().getSiteId() != null) {
+    if (userService.getCurrentUser().getSiteId() != null
+        || userService.getCurrentUser().getPermission().equals("super")) {
       ownerSetUp();
     } else {
       initialSetup();
@@ -133,8 +134,14 @@ public class CreateSiteFragment extends Fragment
     setIsLoading(true);
     fragmentCreateSiteBinding.createSiteButton.setText("Update site");
     initialSetup();
+    String siteId;
+    if (siteService.getCacheSiteId() != null) {
+      siteId = siteService.getCacheSiteId();
+    } else {
+      siteId = userService.getCurrentUser().getSiteId();
+    }
     siteService.getOneSite(
-        userService.getCurrentUser().getSiteId(),
+        siteId,
         new FirebaseCallback<Result<SiteDto>>() {
           @Override
           public void callbackListRes(List<Result<SiteDto>> listT) {}
@@ -176,7 +183,8 @@ public class CreateSiteFragment extends Fragment
   @Override
   public void onResume() {
     super.onResume();
-    if (userService.getCurrentUser().getSiteId() != null) {
+    if (userService.getCurrentUser().getSiteId() != null
+        || userService.getCurrentUser().getPermission().equals("super")) {
       ownerSetUp();
     }
   }
@@ -190,9 +198,17 @@ public class CreateSiteFragment extends Fragment
   }
 
   private Site createSite() {
-    if (userService.getCurrentUser().getSiteId() != null) {
+    String siteId;
+    if (siteService.getCacheSiteId() != null) {
+      siteId = siteService.getCacheSiteId();
+    } else {
+      siteId = userService.getCurrentUser().getSiteId();
+    }
+
+    if (userService.getCurrentUser().getSiteId() != null
+        || userService.getCurrentUser().getPermission().equals("super")) {
       return Site.builder()
-          .id(userService.getCurrentUser().getSiteId())
+          .id(siteId)
           .displayName(fragmentCreateSiteBinding.siteName.getText().toString())
           .owner(userService.getCurrentUser())
           .maxCapacity(Integer.parseInt(fragmentCreateSiteBinding.volunNumId.getText().toString()))
@@ -258,7 +274,8 @@ public class CreateSiteFragment extends Fragment
     setIsLoading(true);
 
     Site createdSite = createSite();
-    if (userService.getCurrentUser().getSiteId() != null) {
+    if (userService.getCurrentUser().getSiteId() != null
+        || userService.getCurrentUser().getPermission().equals("super")) {
       siteService.updateSite(
           currentSite.getId(),
           createdSite,

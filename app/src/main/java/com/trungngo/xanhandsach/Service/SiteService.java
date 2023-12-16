@@ -12,6 +12,7 @@ import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.Report;
+import com.trungngo.xanhandsach.Model.Request;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.Model.User;
 import com.trungngo.xanhandsach.Shared.Constant;
@@ -19,7 +20,10 @@ import com.trungngo.xanhandsach.Shared.PreferenceManager;
 import com.trungngo.xanhandsach.Shared.Result;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class SiteService {
   private final FirebaseFirestore fireStore = FirebaseFirestore.getInstance();
@@ -33,6 +37,64 @@ public class SiteService {
   public SiteService(Context context) {
     this.preferenceManager = new PreferenceManager(context.getApplicationContext());
     this.userService = new UserService(context);
+  }
+
+  public List<SiteDto> getQuerySite(
+      @Nullable String severity, String query, List<SiteDto> sites, @Nullable Date date) {
+    List<SiteDto> results = new ArrayList<>();
+    for (SiteDto site : sites) {
+      if (severity != null) {
+        if (query != null || !query.isEmpty()) {
+          if (severity.equals("All")) {
+            if (site.getDisplayName().contains(query) || site.getAddress().contains(query)) {
+              results.add(site);
+            }
+          } else {
+            if (site.getSeverity().equals(severity)
+                && (site.getDisplayName().contains(query) || site.getAddress().contains(query))) {
+              results.add(site);
+            }
+          }
+        } else {
+          if (site.getSeverity().equals(severity)) {
+            results.add(site);
+          } else {
+            if (severity.equals("All")) {
+              results.add(site);
+            }
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  public void cacheSiteId(String siteId) {
+    preferenceManager.putString(Constant.KEY_SITE_ID, siteId);
+  }
+
+  public String getCacheSiteId() {
+    return preferenceManager.getString(Constant.KEY_SITE_ID);
+  }
+
+  public void getAllSiteAdmin(final FirebaseCallback<Result<List<SiteDto>>> callback) {
+    siteReference
+        .get()
+        .addOnCompleteListener(
+            getSiteTask -> {
+              if (getSiteTask.isSuccessful()) {
+                List<SiteDto> listSite = new ArrayList<>();
+                for (QueryDocumentSnapshot document : getSiteTask.getResult()) {
+                  Site site = document.toObject(Site.class);
+                  SiteDto siteDto = site.toDto();
+                  siteDto.setId(document.getId());
+                  listSite.add(siteDto);
+                }
+                callback.callbackRes(new Result.Success<>(listSite));
+              } else {
+                callback.callbackRes(new Result.Error(getSiteTask.getException()));
+              }
+            });
   }
 
   public void getAllSite(String userId, final FirebaseCallback<Result<List<SiteDto>>> callback) {
@@ -157,6 +219,42 @@ public class SiteService {
                 callback.callbackRes(new Result.Success<>(updatedSite));
               } else {
                 callback.callbackRes(new Result.Error(task.getException()));
+              }
+            });
+  }
+
+  public void updateRequest(
+      String siteId, Request request, final FirebaseCallback<Result<Request>> callback) {
+    siteReference
+        .document(siteId)
+        .update("requests", FieldValue.arrayUnion(request))
+        .addOnFailureListener(
+            task -> {
+              Log.d("Update failed", task.getMessage());
+            })
+        .addOnCompleteListener(
+            task -> {
+              if (task.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(request));
+              } else {
+                callback.callbackRes(new Result.Error(task.getException()));
+              }
+            });
+  }
+
+  public void updateAllRequests(
+      String siteId,
+      List<Request> requests,
+      final FirebaseCallback<Result<List<Request>>> callback) {
+    siteReference
+        .document(siteId)
+        .update("requests", requests)
+        .addOnCompleteListener(
+            updateTask -> {
+              if (updateTask.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(requests));
+              } else {
+                callback.callbackRes(new Result.Error(updateTask.getException()));
               }
             });
   }

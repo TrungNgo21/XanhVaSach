@@ -4,6 +4,9 @@ import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Shared.Constant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +23,8 @@ public class User {
   private String image;
   private String displayName;
   private String siteId;
+  private String joinSiteId;
+  @Builder.Default private List<Notification> notifications = new ArrayList<>();
   @Builder.Default private String fcmToken = null;
   @Builder.Default private String permission = Constant.KEY_PERMISSION_USER;
 
@@ -30,6 +35,7 @@ public class User {
         .fcmToken(fcmToken)
         .permission(permission)
         .image(image)
+        .joinSiteId(joinSiteId)
         .displayName(displayName)
         .siteId(siteId)
         .build();

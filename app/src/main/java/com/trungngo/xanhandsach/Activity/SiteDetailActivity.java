@@ -46,7 +46,10 @@ import com.trungngo.xanhandsach.Adapter.SliderAdapter;
 import com.trungngo.xanhandsach.Adapter.VolunteerAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
+import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.Notification;
+import com.trungngo.xanhandsach.Model.Request;
+import com.trungngo.xanhandsach.Model.User;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
 import com.trungngo.xanhandsach.Service.UserService;
@@ -94,7 +97,6 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     setContentView(siteDetailBinding.getRoot());
     siteService = new SiteService(this);
     userService = new UserService(this, siteService);
-    setButtonListener();
     setUpGuestPerspective();
     setUpDrawer();
   }
@@ -116,7 +118,9 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
               View chipView = siteDetailBinding.severityChip.getRoot();
               SiteDto getSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
               siteDetail = getSite;
-              if (userService.getCurrentUser().getSiteId().equals(getSite.getId())) {
+              setButtonListener();
+              if (userService.getCurrentUser().getSiteId().equals(getSite.getId())
+                  || userService.getCurrentUser().getPermission().equals("super")) {
                 if (getSite.getVolunteers() == null || getSite.getVolunteers().isEmpty()) {
                   siteDetailBinding.volunteerSection.setVisibility(View.VISIBLE);
                   siteDetailBinding.noVolunteer.setVisibility(View.VISIBLE);
@@ -171,7 +175,8 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
 
   private void setButtonListener() {
     String siteId = getIntent().getStringExtra(Constant.KEY_SITE_ID);
-    if (siteId.equals(userService.getCurrentUser().getSiteId())) {
+    if (siteId.equals(userService.getCurrentUser().getSiteId())
+        || userService.getCurrentUser().getPermission().equals("super")) {
       //      if (siteId == userService.getCurrentUser().getSiteId()) {
       //      }
       siteDetailBinding.pleaseHelpText.setVisibility(View.GONE);
@@ -182,41 +187,48 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             startActivity(new Intent(SiteDetailActivity.this, AddSiteActivity.class));
           });
     } else {
+      siteDetailBinding.submitButton.setEnabled(
+          !isApplied(
+              siteDetail.getRequests(), siteDetail.getVolunteers(), userService.getCurrentUser()));
       siteDetailBinding.submitButton.setOnClickListener(
           view -> {
             userService.applyForVolunteer(
                 siteDetail,
-                new FirebaseCallback<Result<SiteDto>>() {
+                new FirebaseCallback<Result<Request>>() {
                   @Override
-                  public void callbackListRes(List<Result<SiteDto>> listT) {}
+                  public void callbackListRes(List<Result<Request>> listT) {}
 
                   @Override
-                  public void callbackRes(Result<SiteDto> siteDtoResult) {
-                    if (siteDtoResult instanceof Result.Success) {
+                  public void callbackRes(Result<Request> requestResult) {
+                    if (requestResult instanceof Result.Success) {
+                      siteDetailBinding.submitButton.setEnabled(false);
                       Toast.makeText(
-                              SiteDetailActivity.this, "Apply successfully!", Toast.LENGTH_SHORT)
-                          .show();
-                      Notification notification =
-                          Notification.builder()
-                              .title("Dear, " + siteDetail.getOwner().getDisplayName())
-                              .body(
-                                  userService.getCurrentUser().getDisplayName()
-                                      + " has just volunteered to clean your site!\n"
-                                      + "Say hi!!!")
-                              .fcmToken(siteDetail.getOwner().getFcmToken())
-                              .build();
-                      List<Notification> notifications = new ArrayList<>();
-                      notifications.add(notification);
-                      userService.sendNotification(notifications);
-                    } else {
-                      Toast.makeText(
-                              SiteDetailActivity.this, "Something wrong!", Toast.LENGTH_SHORT)
+                              SiteDetailActivity.this,
+                              "Your request sent successfully! Please wait for the owner",
+                              Toast.LENGTH_SHORT)
                           .show();
                     }
                   }
                 });
           });
     }
+  }
+
+  private boolean isApplied(List<Request> requests, List<UserDto> volunteers, UserDto currentUser) {
+    if (requests == null) {
+      return false;
+    }
+    for (Request requestEle : requests) {
+      if (requestEle.getVolunteers().getId().equals(currentUser.getId())) {
+        return true;
+      }
+    }
+    for (UserDto volunteer : volunteers) {
+      if (volunteer.getId().equals(currentUser.getId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void setUpSlider(List<String> images) {
@@ -356,13 +368,16 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_chat) {
 
-              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              Intent intent = new Intent(SiteDetailActivity.this, ViewRequestActivity.class);
 
               finish();
               startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_noti) {
+              Intent intent = new Intent(SiteDetailActivity.this, NotificationActivity.class);
+              finish();
+              startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
-              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
-
+              Intent intent = new Intent(SiteDetailActivity.this, AboutUsActivity.class);
               finish();
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_logout) {

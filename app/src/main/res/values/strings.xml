@@ -32,7 +32,39 @@
     <string name="add_site_prompt">Add your own site!</string>
     <string name="add_image_prompt">Add image</string>
 
+    <string name="ableToCreate">
+        * You can create a site where you think is dirty for others to volunteer and clean
+    </string>
+    <string name="ableToVolunteer">* You can be a volunteer yourself!!!</string>
+    <string name="ableToUseMap">
+        * You can easily find a site near you using our implemented map!
+    </string>
+    <string name="ableToCreateReport">
+        * You can create report about your own site
+    </string>
+
+
+    <string name="welcomeText">
+        Welcome to XanhAndSach!!!
+    </string>
+    <string name="welcomePromptText">
+        Give a hand to build a beautiful society!
+    </string>
+    <string name="ablePromptText">
+        What you can do:
+    </string>
+    <string name="notification_coming_text">
+        Upcoming notifications!
+    </string>
+
     <string-array name="severity_category">
+        <item>Quite Dirty</item>
+        <item>Dirty</item>
+        <item>Extremely Dirty</item>
+    </string-array>
+
+    <string-array name="severity_category_search">
+        <item>All</item>
         <item>Quite Dirty</item>
         <item>Dirty</item>
         <item>Extremely Dirty</item>

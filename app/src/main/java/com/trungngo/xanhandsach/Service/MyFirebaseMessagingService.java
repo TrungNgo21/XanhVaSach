@@ -15,16 +15,54 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.Firebase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.google.firebase.storage.FirebaseStorage;
 import com.trungngo.xanhandsach.Activity.MainActivity;
 import com.trungngo.xanhandsach.R;
+import com.trungngo.xanhandsach.Shared.Constant;
+import com.trungngo.xanhandsach.Shared.PreferenceManager;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+
+  private final UserService userService = new UserService(this);
 
   @Override
   public void onNewToken(@NonNull String token) {
     super.onNewToken(token);
+    FirebaseMessaging.getInstance()
+        .getToken()
+        .addOnCompleteListener(
+            tokenTask -> {
+              if (tokenTask.isSuccessful()) {
+                String fcmToken = tokenTask.getResult();
+                FirebaseFirestore.getInstance()
+                    .collection(Constant.KEY_COLLECTION_USERS)
+                    .document(userService.getCurrentUser().getId())
+                    .update("fcmToken", fcmToken)
+                    .addOnCompleteListener(
+                        task -> {
+                          if (task.isSuccessful()) {
+                            FirebaseFirestore.getInstance()
+                                .collection(Constant.KEY_COLLECTION_SITES)
+                                .document(userService.getCurrentUser().getSiteId())
+                                .update("owner.fcmToken", fcmToken)
+                                .addOnCompleteListener(
+                                    updateTokenTask -> {
+                                      if (updateTokenTask.isSuccessful()) {}
+                                    });
+                          }
+                        });
+                if (userService.getCurrentUser().getJoinSiteId() != null) {
+                  FirebaseFirestore.getInstance()
+                      .collection(Constant.KEY_COLLECTION_SITES)
+                      .document();
+                }
+              }
+            });
   }
 
   @Override

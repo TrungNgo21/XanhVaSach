@@ -9,10 +9,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.dialog.InsetDialogOnTouchListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.trungngo.xanhandsach.Activity.MainActivity;
@@ -31,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
@@ -183,17 +186,6 @@ public class UserService {
 
   public void signOut() {
     preferenceManager.clear();
-    //    FirebaseMessaging.getInstance()
-    //        .deleteToken()
-    //        .addOnCompleteListener(
-    //            deleteTask -> {
-    //              if (deleteTask.isSuccessful()) {
-    //                Log.d("FCM", "delete successfully!");
-    //              } else {
-    //
-    //                Log.d("FCM", deleteTask.getException().toString());
-    //              }
-    //            });
   }
 
   public boolean getLogInStatus() {
@@ -274,8 +266,9 @@ public class UserService {
             });
   }
 
-  public void applyForVolunteer(SiteDto site, final FirebaseCallback<Result<SiteDto>> callback) {
-    site.setVolunteers(new ArrayList<>(asList(getCurrentUser())));
+  public void acceptRequest(
+      UserDto volunteer, SiteDto site, final FirebaseCallback<Result<List<UserDto>>> callback) {
+    site.setVolunteers(new ArrayList<>(asList(volunteer)));
     siteService.updateSiteVolunteers(
         site.getId(),
         site.getVolunteers(),
@@ -294,23 +287,117 @@ public class UserService {
         });
   }
 
-  public void sendNotification(List<Notification> notifications) {
-    for (Notification notification : notifications) {
-      JSONObject jsonObject = new JSONObject();
-      JSONObject dataObject = new JSONObject();
-      JSONObject notificationObject = new JSONObject();
-      try {
-        notificationObject.put("title", notification.getTitle());
-        notificationObject.put("body", notification.getBody());
-        dataObject.put("userId", getCurrentUser().getId());
-        jsonObject.put("notification", notificationObject);
-        jsonObject.put("data", dataObject);
-        jsonObject.put("to", notification.getFcmToken());
-        callApi(jsonObject);
-      } catch (JSONException e) {
-        throw new RuntimeException(e);
-      }
-    }
+  public void applyForVolunteer(
+      SiteDto site,
+      final FirebaseCallback<Result<com.trungngo.xanhandsach.Model.Request>> callback) {
+    Notification request =
+        Notification.builder()
+            .fcmToken(site.getOwner().getFcmToken())
+            .title("Request for volunteer")
+            .body(
+                "Dear, "
+                    + site.getOwner().getDisplayName()
+                    + "\n"
+                    + "I am "
+                    + getCurrentUser().getDisplayName()
+                    + ". I want to apply for your site. Please approve =>>")
+            .createdDate(new Date())
+            .build();
+    sendNotification(
+        request,
+        site.getOwner().getId(),
+        new FirebaseCallback<Result<Notification>>() {
+          @Override
+          public void callbackListRes(List<Result<Notification>> listT) {}
+
+          @Override
+          public void callbackRes(Result<Notification> notificationResult) {
+            if (notificationResult instanceof Result.Success) {
+              Log.d("noti update", "Success");
+            } else {
+              Log.d("noti update", "Error");
+            }
+          }
+        });
+    com.trungngo.xanhandsach.Model.Request volunteerRequest =
+        com.trungngo.xanhandsach.Model.Request.builder()
+            .sentDate(new Date())
+            .volunteers(getCurrentUser())
+            .build();
+    siteService.updateRequest(
+        site.getId(),
+        volunteerRequest,
+        new FirebaseCallback<Result<com.trungngo.xanhandsach.Model.Request>>() {
+          @Override
+          public void callbackListRes(List<Result<com.trungngo.xanhandsach.Model.Request>> listT) {}
+
+          @Override
+          public void callbackRes(Result<com.trungngo.xanhandsach.Model.Request> requestResult) {
+            if (requestResult instanceof Result.Success) {
+              com.trungngo.xanhandsach.Model.Request volunteerRequest =
+                  ((Result.Success<com.trungngo.xanhandsach.Model.Request>) requestResult)
+                      .getData();
+              callback.callbackRes(new Result.Success<>(volunteerRequest));
+            } else {
+              callback.callbackRes(new Result.Error(new Exception(volunteerRequest.toString())));
+            }
+          }
+        });
+  }
+
+  //  private void updateUserNotification(String userId, Notification){
+  //      userReference.document(userId).update("notifications", FieldValue.arrayUnion())
+  //  }
+
+  public void sendNotification(
+      Notification notification,
+      String userId,
+      final FirebaseCallback<Result<Notification>> callback) {
+    userReference
+        .document(userId)
+        .update("notifications", FieldValue.arrayUnion(notification))
+        .addOnCompleteListener(
+            updateNotiTask -> {
+              if (updateNotiTask.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(notification));
+              } else {
+                callback.callbackRes(new Result.Error(updateNotiTask.getException()));
+              }
+            });
+  }
+
+  public void getNotifications(String userId, final FirebaseCallback<Result<UserDto>> callback) {
+    userReference
+        .document(userId)
+        .get()
+        .addOnCompleteListener(
+            userTask -> {
+              if (userTask.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = userTask.getResult();
+                UserDto user = documentSnapshot.toObject(UserDto.class);
+                user.setId(getCurrentUser().getId());
+                callback.callbackRes(new Result.Success<>(user));
+              } else {
+                callback.callbackRes(new Result.Error(userTask.getException()));
+              }
+            });
+  }
+
+  public void updateNotifications(
+      String userId,
+      List<Notification> notifications,
+      final FirebaseCallback<Result<List<Notification>>> callback) {
+    userReference
+        .document(userId)
+        .update("notifications", notifications)
+        .addOnCompleteListener(
+            updateTask -> {
+              if (updateTask.isSuccessful()) {
+                callback.callbackRes(new Result.Success<>(notifications));
+              } else {
+                callback.callbackRes(new Result.Error(updateTask.getException()));
+              }
+            });
   }
 
   private void callApi(JSONObject jsonObject) {

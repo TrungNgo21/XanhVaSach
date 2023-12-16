@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/query"
+        android:background="@drawable/input_field"
+        android:layout_weight="2"
+        android:paddingHorizontal="@dimen/_4sdp"
+        style="@style/GeneralInfoNormal"
+        android:hint="Enter site name or address"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_30sdp" />
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginStart="@dimen/_4sdp"
+        android:background="@drawable/input_field">
+
+        <Spinner
+            android:id="@+id/severityCate"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:spinnerMode="dropdown" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@drawable/drop" />
+    </RelativeLayout>
+
+</LinearLayout>

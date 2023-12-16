@@ -129,10 +129,13 @@ public class MainActivity extends AppCompatActivity {
               Intent intent = new Intent(MainActivity.this, AddSiteActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_chat) {
-              Intent intent = new Intent(MainActivity.this, MainActivity.class);
+              Intent intent = new Intent(MainActivity.this, ViewRequestActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_noti) {
+              Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
-              Intent intent = new Intent(MainActivity.this, MainActivity.class);
+              Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(MainActivity.this, SignInActivity.class);

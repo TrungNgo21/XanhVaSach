@@ -93,6 +93,6 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
-    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-messaging:23.4.0")
 
 }

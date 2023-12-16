@@ -19,7 +19,13 @@
         android:theme="@style/Theme.XanhAndSach"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.VolunteerRequestActivity"
+            android:name=".Activity.NotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.AboutUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.ViewRequestActivity"
             android:exported="false" />
 
         <service

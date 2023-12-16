@@ -11,8 +11,12 @@
             android:icon="@drawable/site_icon"/>
         <item
             android:id="@+id/nav_chat"
-            android:title="Messages"
+            android:title="Request"
             android:icon="@drawable/chat_icon"/>
+        <item
+            android:id="@+id/nav_noti"
+            android:title="Notifications"
+            android:icon="@drawable/noti_icon"/>
         <item
             android:id="@+id/nav_about_us"
             android:title="About Us"

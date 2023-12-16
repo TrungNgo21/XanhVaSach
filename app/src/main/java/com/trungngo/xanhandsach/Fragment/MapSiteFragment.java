@@ -71,6 +71,7 @@ import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Model.CustomMarker;
 import com.trungngo.xanhandsach.Model.PolylineInfo;
+import com.trungngo.xanhandsach.Model.Request;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.SiteService;
@@ -86,7 +87,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MapSiteFragment extends Fragment
-    implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener, LocationListener {
+    implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener {
 
   private FragmentMapSiteBinding fragmentMapSiteBinding;
 
@@ -142,6 +143,7 @@ public class MapSiteFragment extends Fragment
     siteService = new SiteService(requireContext());
     userService = new UserService(requireContext());
     currentUser = userService.getCurrentUser();
+    //    startLocationUpdates();
     //    getLastLocation();
     siteService.getAllSite(
         currentUser.getId(),
@@ -188,11 +190,13 @@ public class MapSiteFragment extends Fragment
             }
             super.onLocationResult(locationResult);
             //            getLastLocation();
+
+            //            getLastLocation();
           }
         };
 
     //    checkAndRequestLocationPermission();
-    //    getLastLocation();
+    getLastLocation();
   }
 
   @Override
@@ -206,6 +210,7 @@ public class MapSiteFragment extends Fragment
     super.onResume();
     //    checkAndRequestLocationPermission();
     startLocationUpdates();
+    getLastLocation();
 
     //    if (customManager != null) {
     //      setUserMarker(customManager);
@@ -232,6 +237,7 @@ public class MapSiteFragment extends Fragment
                 requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
       startLocationUpdates();
+      getLastLocation();
     } else {
       requestLocationPermission();
     }
@@ -251,8 +257,6 @@ public class MapSiteFragment extends Fragment
                   "Please turn on GPS permission otherwise you can not use map features",
                   Toast.LENGTH_SHORT);
               isAllowedAccessLocation = false;
-              // Permission denied; handle accordingly (e.g., show a message, disable location
-              // features)
             }
           });
 
@@ -411,6 +415,32 @@ public class MapSiteFragment extends Fragment
           intent.putExtra(Constant.KEY_SITE_ID, siteDto.getId());
           startActivity(intent);
         });
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      fragmentMapSiteBinding.applyBtn.setVisibility(View.GONE);
+    } else {
+      fragmentMapSiteBinding.applyBtn.setVisibility(View.VISIBLE);
+      fragmentMapSiteBinding.applyBtn.setOnClickListener(
+          view -> {
+            userService.applyForVolunteer(
+                siteDto,
+                new FirebaseCallback<Result<Request>>() {
+                  @Override
+                  public void callbackListRes(List<Result<Request>> listT) {}
+
+                  @Override
+                  public void callbackRes(Result<Request> requestResult) {
+                    if (requestResult instanceof Result.Success) {
+                      fragmentMapSiteBinding.applyBtn.setEnabled(false);
+                      Toast.makeText(
+                              requireContext(),
+                              "Your request sent successfully! Please wait for the owner",
+                              Toast.LENGTH_SHORT)
+                          .show();
+                    }
+                  }
+                });
+          });
+    }
   }
 
   private void setCameraView(GoogleMap googleMap) {
@@ -585,12 +615,5 @@ public class MapSiteFragment extends Fragment
         polylineData.getPolyline().setZIndex(0);
       }
     }
-  }
-
-  @Override
-  public void onLocationChanged(@NonNull Location location) {
-    currentUser.setLatitude(location.getLatitude());
-    currentUser.setLongitude(location.getLongitude());
-    getLastLocation();
   }
 }

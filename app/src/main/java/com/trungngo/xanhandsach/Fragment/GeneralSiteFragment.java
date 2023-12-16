@@ -8,10 +8,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -37,7 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
-public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteSelected {
+public class GeneralSiteFragment extends Fragment
+    implements SiteAdapter.OnSiteSelected, AdapterView.OnItemSelectedListener {
 
   private FragmentGeneralSiteBinding fragmentGeneralSiteBinding;
   private UserService userService;
@@ -47,16 +52,28 @@ public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteS
 
   private List<SiteDto> sites;
 
+  private String severityCategory;
+
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     //    userService.signOut();
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_general_site, container, false);
-    UserDto currentUser = userService.getCurrentUser();
     fragmentGeneralSiteBinding.listSite.setLayoutManager(new LinearLayoutManager(getContext()));
+    UserDto currentUser = userService.getCurrentUser();
+    if (currentUser.getPermission().equals("super")) {
+      setUpAdminView();
+    } else {
+      setUpNormalView(currentUser);
+    }
     setUpShimmer(true);
+    setUpSpinner();
+    setUpSearchQuery();
+    return fragmentGeneralSiteBinding.getRoot();
+  }
 
+  private void setUpNormalView(UserDto currentUser) {
     if (userService.getCurrentUser().getSiteId() == null) {
       fragmentGeneralSiteBinding.mySite.setVisibility(View.VISIBLE);
       getYourOwnSite(null, null);
@@ -98,7 +115,29 @@ public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteS
             }
           }
         });
-    return fragmentGeneralSiteBinding.getRoot();
+  }
+
+  private void setUpAdminView() {
+    siteService.getAllSiteAdmin(
+        new FirebaseCallback<Result<List<SiteDto>>>() {
+          @Override
+          public void callbackListRes(List<Result<List<SiteDto>>> listT) {}
+
+          @Override
+          public void callbackRes(Result<List<SiteDto>> listResult) {
+            if (listResult instanceof Result.Success) {
+              sites = ((Result.Success<List<SiteDto>>) listResult).getData();
+              siteAdapter.setData(sites);
+              fragmentGeneralSiteBinding.listSite.setAdapter(siteAdapter);
+              fragmentGeneralSiteBinding.mySite.setVisibility(View.GONE);
+
+              setUpShimmer(false);
+
+            } else {
+              Log.d("Cannot get any thing", listResult.toString());
+            }
+          }
+        });
   }
 
   @Override
@@ -183,6 +222,62 @@ public class GeneralSiteFragment extends Fragment implements SiteAdapter.OnSiteS
     Intent intent =
         new Intent(fragmentGeneralSiteBinding.getRoot().getContext(), SiteDetailActivity.class);
     intent.putExtra(Constant.KEY_SITE_ID, sites.get(position).getId());
+    siteService.cacheSiteId(sites.get(position).getId());
     startActivity(intent);
   }
+
+  private void setUpSearchQuery() {
+    fragmentGeneralSiteBinding.searchBar.query.addTextChangedListener(onQueryChange());
+  }
+
+  private void setUpSpinner() {
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.severity_category_search,
+            android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    fragmentGeneralSiteBinding.searchBar.severityCate.setAdapter(adapter);
+    fragmentGeneralSiteBinding.searchBar.severityCate.setOnItemSelectedListener(this);
+  }
+
+  private TextWatcher onQueryChange() {
+    return new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+        List<SiteDto> res = new ArrayList<>();
+        res =
+            siteService.getQuerySite(
+                severityCategory,
+                fragmentGeneralSiteBinding.searchBar.query.getText().toString(),
+                sites,
+                null);
+        siteAdapter.setData(res);
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {}
+    };
+  }
+
+  @Override
+  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    severityCategory = parent.getItemAtPosition(position).toString();
+    List<SiteDto> res = new ArrayList<>();
+    if (sites != null) {
+      res =
+          siteService.getQuerySite(
+              severityCategory,
+              fragmentGeneralSiteBinding.searchBar.query.getText().toString(),
+              sites,
+              null);
+      siteAdapter.setData(res);
+    }
+  }
+
+  @Override
+  public void onNothingSelected(AdapterView<?> parent) {}
 }

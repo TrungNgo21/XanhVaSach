@@ -1,5 +1,7 @@
 package com.trungngo.xanhandsach.Model;
 
+import android.view.PixelCopy;
+
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
 import com.trungngo.xanhandsach.Shared.DateFormatter;
@@ -29,6 +31,7 @@ public class Site {
   private String description;
   private boolean isDeleted;
   private List<Report> reports;
+  @Builder.Default private List<Request> requests = new ArrayList<>();
   @Builder.Default private List<String> imageUrl = new ArrayList<>();
   @Builder.Default private List<UserDto> volunteers = new ArrayList<>();
   @Builder.Default private Date createdDate = new Date();
@@ -50,6 +53,7 @@ public class Site {
         .imageUrl(imageUrl)
         .latitude(latitude)
         .longitude(longitude)
+        .requests(requests)
         .build();
   }
 }

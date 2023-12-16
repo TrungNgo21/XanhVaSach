@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.trungngo.xanhandsach.Model.Report;
+import com.trungngo.xanhandsach.Model.Request;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +33,7 @@ public class SiteDto {
   private List<String> imageUrl;
   private List<UserDto> volunteers;
   private List<Report> reports;
+  private List<Request> requests;
   private String createdDate;
   private String updatedDate;
   private String address;
