@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">XanhAndSach</string>
     <string name="mock_up_title">My application</string>
-    <string name="google_map_key">AIzaSyCRE8_6MgWmPqa5WaW_W0jfx--o-KQp0Kg</string>
+    <string name="google_map_key">AIzaSyBiKCD0sJBfjF8OHDT6j-8iTHh3PAdB268</string>
     <string name="authentication_default_error">
         Authentication failed! Try again.
     </string>

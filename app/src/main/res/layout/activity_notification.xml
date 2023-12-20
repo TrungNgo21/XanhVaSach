@@ -45,6 +45,20 @@
                 android:id="@+id/notiList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/noNoti"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/GeneralCardHeading"
+                    android:text="No notifications found!!!" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

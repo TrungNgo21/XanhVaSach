@@ -46,12 +46,14 @@ public class SiteService {
       if (severity != null) {
         if (query != null || !query.isEmpty()) {
           if (severity.equals("All")) {
-            if (site.getDisplayName().contains(query) || site.getAddress().contains(query)) {
+            if (site.getDisplayName().toLowerCase().contains(query)
+                || site.getAddress().toLowerCase().contains(query)) {
               results.add(site);
             }
           } else {
             if (site.getSeverity().equals(severity)
-                && (site.getDisplayName().contains(query) || site.getAddress().contains(query))) {
+                && (site.getDisplayName().toLowerCase().contains(query)
+                    || site.getAddress().toLowerCase().contains(query))) {
               results.add(site);
             }
           }
@@ -153,8 +155,6 @@ public class SiteService {
                     public void callbackRes(Result<UserDto> userDtoResult) {
                       if (userDtoResult instanceof Result.Success) {
                         UserDto currentUser = ((Result.Success<UserDto>) userDtoResult).getData();
-                        currentUser.setSiteId(id);
-                        preferenceManager.putCurrentUser(currentUser);
                         Log.d("Update site", "Successfully");
                       } else {
                         Log.d("Update site", "Error!");
@@ -188,16 +188,14 @@ public class SiteService {
   }
 
   public void updateSiteVolunteers(
-      String siteId,
-      List<UserDto> volunteers,
-      final FirebaseCallback<Result<List<UserDto>>> callback) {
+      String siteId, UserDto volunteers, final FirebaseCallback<Result<UserDto>> callback) {
     siteReference
         .document(siteId)
-        .update("volunteers", volunteers)
+        .update("volunteers", FieldValue.arrayUnion(volunteers))
         .addOnCompleteListener(
             updateTask -> {
               if (updateTask.isSuccessful()) {
-                callback.callbackRes(new Result.Success<List<UserDto>>(volunteers));
+                callback.callbackRes(new Result.Success<UserDto>(volunteers));
               } else {
                 callback.callbackRes(new Result.Error(updateTask.getException()));
               }

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="View your reports!"
         style="@style/GeneralCardHeading1"
-        android:layout_marginBottom="@dimen/_4sdp" />
+        android:layout_marginBottom="@dimen/_6sdp" />
 
     <LinearLayout
         android:id="@+id/notHaveSite"
@@ -43,6 +43,21 @@
             android:backgroundTint="@color/primary_dark"
             android:text="Go to create site" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/noReport"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/GeneralCardHeading"
+            android:text="No report found!!!" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/notHaveReport"

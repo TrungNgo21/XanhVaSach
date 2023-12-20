@@ -52,6 +52,8 @@ public class GeneralSiteFragment extends Fragment
 
   private List<SiteDto> sites;
 
+  private UserDto currentUser;
+
   private String severityCategory;
 
   @Override
@@ -61,7 +63,7 @@ public class GeneralSiteFragment extends Fragment
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_general_site, container, false);
     fragmentGeneralSiteBinding.listSite.setLayoutManager(new LinearLayoutManager(getContext()));
-    UserDto currentUser = userService.getCurrentUser();
+    currentUser = userService.getCurrentUser();
     if (currentUser.getPermission().equals("super")) {
       setUpAdminView();
     } else {
@@ -256,6 +258,11 @@ public class GeneralSiteFragment extends Fragment
                 sites,
                 null);
         siteAdapter.setData(res);
+        if (res.isEmpty()) {
+          fragmentGeneralSiteBinding.noSite.setVisibility(View.VISIBLE);
+        } else {
+          fragmentGeneralSiteBinding.noSite.setVisibility(View.GONE);
+        }
       }
 
       @Override
@@ -280,4 +287,14 @@ public class GeneralSiteFragment extends Fragment
 
   @Override
   public void onNothingSelected(AdapterView<?> parent) {}
+
+  //  @Override
+  //  public void onResume() {
+  //    super.onResume();
+  //    if (currentUser.getPermission().equals("super")) {
+  //      setUpAdminView();
+  //    } else {
+  //      setUpNormalView(currentUser);
+  //    }
+  //  }
 }

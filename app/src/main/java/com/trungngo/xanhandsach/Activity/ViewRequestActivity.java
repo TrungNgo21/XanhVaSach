@@ -48,8 +48,10 @@ public class ViewRequestActivity extends AppCompatActivity
   private UserService userService;
   private SiteService siteService;
 
-  private List<Request> requests;
+  private List<Request> requests = new ArrayList<>();
   private SiteDto mSite;
+
+  private List<SiteDto> mListSite;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +64,40 @@ public class ViewRequestActivity extends AppCompatActivity
     requestAdapter = new RequestAdapter(ViewRequestActivity.this, this, this);
     activityViewRequestBinding.requestList.setLayoutManager(
         new LinearLayoutManager(getApplicationContext()));
-    setUpView();
-    setUpDrawer();
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      setUpAdminView();
+      setUpAdminDrawer();
+    } else {
+      setUpView();
+      setUpDrawer();
+    }
+  }
+
+  private void setUpAdminView() {
+    siteService.getAllSiteAdmin(
+        new FirebaseCallback<Result<List<SiteDto>>>() {
+          @Override
+          public void callbackListRes(List<Result<List<SiteDto>>> listT) {}
+
+          @Override
+          public void callbackRes(Result<List<SiteDto>> listResult) {
+            if (listResult instanceof Result.Success) {
+              mListSite = ((Result.Success<List<SiteDto>>) listResult).getData();
+              for (SiteDto siteDto : mListSite) {
+                if (siteDto.getRequests() != null || !siteDto.getRequests().isEmpty()) {
+                  requests.addAll(siteDto.getRequests());
+                }
+              }
+              if (requests == null || requests.isEmpty()) {
+                activityViewRequestBinding.noVolunteer.setVisibility(View.VISIBLE);
+              } else {
+                activityViewRequestBinding.noVolunteer.setVisibility(View.GONE);
+              }
+              requestAdapter.setData(requests);
+              activityViewRequestBinding.requestList.setAdapter(requestAdapter);
+            }
+          }
+        });
   }
 
   private void setUpView() {
@@ -78,7 +112,9 @@ public class ViewRequestActivity extends AppCompatActivity
           public void callbackRes(Result<SiteDto> siteDtoResult) {
             if (siteDtoResult instanceof Result.Success) {
               SiteDto siteDto = ((Result.Success<SiteDto>) siteDtoResult).getData();
-              requests = siteDto.getRequests();
+              if (siteDto.getRequests() != null || !siteDto.getRequests().isEmpty()) {
+                requests = siteDto.getRequests();
+              }
               if (requests == null || requests.isEmpty()) {
                 activityViewRequestBinding.noVolunteer.setVisibility(View.VISIBLE);
               } else {
@@ -92,15 +128,11 @@ public class ViewRequestActivity extends AppCompatActivity
         });
   }
 
-  private void setUpDrawer() {
+  private void generalDrawerSetUp() {
     drawerLayout = activityViewRequestBinding.drawer;
     navigationView = activityViewRequestBinding.navView;
-    activityViewRequestBinding.toolbarId.toolbarTitleId.setText("Notifications");
+    activityViewRequestBinding.toolbarId.toolbarTitleId.setText("Requests");
     activityViewRequestBinding.toolbarId.backIcon.setVisibility(View.VISIBLE);
-    activityViewRequestBinding.toolbarId.backIcon.setOnClickListener(
-        view -> {
-          finish();
-        });
 
     View headerView = navigationView.getHeaderView(0);
     TextView currentUserName = headerView.findViewById(R.id.displayName);
@@ -109,18 +141,19 @@ public class ViewRequestActivity extends AppCompatActivity
     drawerLayout.closeDrawer(GravityCompat.START);
 
     navigationView.bringToFront();
-
+    activityViewRequestBinding.toolbarId.backIcon.setOnClickListener(
+        view -> {
+          finish();
+        });
     currentUserName.setText(userService.getCurrentUser().getDisplayName());
     currentUserEmail.setText(userService.getCurrentUser().getEmail());
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
     setSupportActionBar(activityViewRequestBinding.toolbarId.menuIconId);
-    //    navigationView.bringToFront();
     ActionBarDrawerToggle drawerToggle =
         new ActionBarDrawerToggle(
             this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
-    //    drawerToggle.syncState();
     navigationView.setCheckedItem(R.id.nav_chat);
     activityViewRequestBinding.toolbarId.menuIconId.setOnClickListener(
         view -> {
@@ -130,6 +163,44 @@ public class ViewRequestActivity extends AppCompatActivity
             drawerLayout.openDrawer(GravityCompat.START);
           }
         });
+  }
+
+  private void setUpAdminDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.admin_menu);
+    navigationView.setCheckedItem(R.id.nav_chat);
+
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              Intent intent = new Intent(ViewRequestActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              Intent intent = new Intent(ViewRequestActivity.this, AddSiteActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              return false;
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              Intent intent = new Intent(ViewRequestActivity.this, AboutUsActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(ViewRequestActivity.this, SignInActivity.class);
+              userService.signOut();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
+  }
+
+  private void setUpDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.main_menu);
+    navigationView.setCheckedItem(R.id.nav_chat);
 
     navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {
@@ -175,7 +246,7 @@ public class ViewRequestActivity extends AppCompatActivity
     mSite.getVolunteers().add(request.getVolunteers());
     userService.acceptRequest(
         request.getVolunteers(),
-        mSite,
+        request.getToSite(),
         new FirebaseCallback<Result<List<UserDto>>>() {
           @Override
           public void callbackListRes(List<Result<List<UserDto>>> listT) {}
@@ -214,6 +285,11 @@ public class ViewRequestActivity extends AppCompatActivity
                   });
               requests.remove(position);
               requestAdapter.setData(requests);
+              if (requests.isEmpty()) {
+                activityViewRequestBinding.noVolunteer.setVisibility(View.VISIBLE);
+              } else {
+                activityViewRequestBinding.noVolunteer.setVisibility(View.GONE);
+              }
               siteService.updateAllRequests(
                   userService.getCurrentUser().getSiteId(),
                   requests,
@@ -233,6 +309,7 @@ public class ViewRequestActivity extends AppCompatActivity
             } else {
               Toast.makeText(ViewRequestActivity.this, "Something wrong!", Toast.LENGTH_SHORT)
                   .show();
+              Log.d("something", listResult.toString());
             }
           }
         });
@@ -243,8 +320,13 @@ public class ViewRequestActivity extends AppCompatActivity
     Request request = requests.get(position);
     requests.remove(position);
     requestAdapter.setData(requests);
+    if (requests.isEmpty()) {
+      activityViewRequestBinding.noVolunteer.setVisibility(View.VISIBLE);
+    } else {
+      activityViewRequestBinding.noVolunteer.setVisibility(View.GONE);
+    }
     siteService.updateAllRequests(
-        userService.getCurrentUser().getSiteId(),
+        request.getToSite().getId(),
         requests,
         new FirebaseCallback<Result<List<Request>>>() {
           @Override

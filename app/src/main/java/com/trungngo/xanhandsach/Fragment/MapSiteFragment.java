@@ -196,7 +196,7 @@ public class MapSiteFragment extends Fragment
         };
 
     //    checkAndRequestLocationPermission();
-    getLastLocation();
+    //    getLastLocation();
   }
 
   @Override
@@ -403,7 +403,7 @@ public class MapSiteFragment extends Fragment
       fragmentMapSiteBinding.durationContainer.setVisibility(View.VISIBLE);
       fragmentMapSiteBinding.toDetails.setVisibility(View.VISIBLE);
       fragmentMapSiteBinding.imageSlider.setVisibility(View.VISIBLE);
-      fragmentMapSiteBinding.applyBtn.setVisibility(View.VISIBLE);
+      fragmentMapSiteBinding.applyBtn.setVisibility(View.GONE);
       fragmentMapSiteBinding.sliderIndicator.setVisibility(View.VISIBLE);
     }
   }
@@ -418,7 +418,7 @@ public class MapSiteFragment extends Fragment
     if (userService.getCurrentUser().getPermission().equals("super")) {
       fragmentMapSiteBinding.applyBtn.setVisibility(View.GONE);
     } else {
-      fragmentMapSiteBinding.applyBtn.setVisibility(View.VISIBLE);
+      fragmentMapSiteBinding.applyBtn.setVisibility(View.GONE);
       fragmentMapSiteBinding.applyBtn.setOnClickListener(
           view -> {
             userService.applyForVolunteer(
@@ -436,6 +436,8 @@ public class MapSiteFragment extends Fragment
                               "Your request sent successfully! Please wait for the owner",
                               Toast.LENGTH_SHORT)
                           .show();
+                    } else {
+                      Log.d("error apply", requestResult.toString());
                     }
                   }
                 });

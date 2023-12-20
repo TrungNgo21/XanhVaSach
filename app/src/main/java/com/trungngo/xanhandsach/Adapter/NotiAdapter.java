@@ -51,13 +51,21 @@ public class NotiAdapter extends RecyclerView.Adapter<NotiAdapter.NotiViewHolder
     holder.title.setText(notification.getTitle());
     holder.content.setText(notification.getBody());
     holder.date.setText(DateFormatter.toDateString(notification.getCreatedDate()));
+    if (notification.isRequest()) {
+      holder.toRequestButton.setVisibility(View.VISIBLE);
+    }
+    if (notification.isSiteUpdated()) {
+      holder.toRequestButton.setVisibility(View.VISIBLE);
+
+      holder.toRequestButton.setText("To Detail");
+    }
     holder.deleteButton.setOnClickListener(
         view -> {
           onDeleteButton.deleteItem(position);
         });
     holder.toRequestButton.setOnClickListener(
         view -> {
-          onRequestButton.toRequest();
+          onRequestButton.toRequest(position);
         });
   }
 
@@ -93,7 +101,7 @@ public class NotiAdapter extends RecyclerView.Adapter<NotiAdapter.NotiViewHolder
   }
 
   public interface OnRequestButton {
-    void toRequest();
+    void toRequest(int position);
   }
 
   public interface OnDeleteButton {

@@ -44,8 +44,11 @@ public class AddSiteActivity extends AppCompatActivity {
     setContentView(activityAddSiteBinding.getRoot());
     createSiteAdapter = new CreateSiteAdapter(this);
     activityAddSiteBinding.pageContent.setAdapter(createSiteAdapter);
-
-    setUpDrawer();
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      setUpAdminDrawer();
+    } else {
+      setUpDrawer();
+    }
 
     activityAddSiteBinding.tabLayout.addOnTabSelectedListener(
         new TabLayout.OnTabSelectedListener() {
@@ -70,11 +73,11 @@ public class AddSiteActivity extends AppCompatActivity {
         });
   }
 
-  private void setUpDrawer() {
+  private void generalDrawerSetUp() {
     drawerLayout = activityAddSiteBinding.drawer;
     navigationView = activityAddSiteBinding.navView;
-    activityAddSiteBinding.toolbarId.toolbarTitleId.setText("My Site");
-    activityAddSiteBinding.toolbarId.backIcon.setVisibility(View.GONE);
+    activityAddSiteBinding.toolbarId.toolbarTitleId.setText("Current site");
+    activityAddSiteBinding.toolbarId.backIcon.setVisibility(View.VISIBLE);
 
     View headerView = navigationView.getHeaderView(0);
     TextView currentUserName = headerView.findViewById(R.id.displayName);
@@ -83,19 +86,19 @@ public class AddSiteActivity extends AppCompatActivity {
     drawerLayout.closeDrawer(GravityCompat.START);
 
     navigationView.bringToFront();
-
+    activityAddSiteBinding.toolbarId.backIcon.setOnClickListener(
+        view -> {
+          finish();
+        });
     currentUserName.setText(userService.getCurrentUser().getDisplayName());
     currentUserEmail.setText(userService.getCurrentUser().getEmail());
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
     setSupportActionBar(activityAddSiteBinding.toolbarId.menuIconId);
-    //    navigationView.bringToFront();
     ActionBarDrawerToggle drawerToggle =
         new ActionBarDrawerToggle(
             this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
-    //    drawerToggle.syncState();
-    navigationView.setCheckedItem(R.id.nav_site);
     activityAddSiteBinding.toolbarId.menuIconId.setOnClickListener(
         view -> {
           if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -104,6 +107,13 @@ public class AddSiteActivity extends AppCompatActivity {
             drawerLayout.openDrawer(GravityCompat.START);
           }
         });
+  }
+
+  private void setUpAdminDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.admin_menu);
+    navigationView.setCheckedItem(R.id.nav_site);
 
     navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {
@@ -120,14 +130,46 @@ public class AddSiteActivity extends AppCompatActivity {
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
               Intent intent = new Intent(AddSiteActivity.this, AboutUsActivity.class);
               startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(AddSiteActivity.this, SignInActivity.class);
+              userService.signOut();
+              finish();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
+  }
+
+  private void setUpDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.main_menu);
+    navigationView.setCheckedItem(R.id.nav_site);
+
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              Intent intent = new Intent(AddSiteActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              return false;
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              Intent intent = new Intent(AddSiteActivity.this, ViewRequestActivity.class);
+              startActivity(intent);
+
             } else if (menuItem.getItemId() == R.id.nav_noti) {
               Intent intent = new Intent(AddSiteActivity.this, NotificationActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              Intent intent = new Intent(AddSiteActivity.this, AboutUsActivity.class);
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_logout) {
               Intent intent = new Intent(AddSiteActivity.this, SignInActivity.class);
               userService.signOut();
               finish();
-
               startActivity(intent);
             }
             return false;

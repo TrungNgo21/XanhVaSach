@@ -72,23 +72,19 @@ public class MainActivity extends AppCompatActivity {
           @Override
           public void onTabReselected(TabLayout.Tab tab) {}
         });
-    //    activityMainBinding.pageContent((v, event) -> true);
-    //    activityMainBinding.pageContent.registerOnPageChangeCallback(
-    //        new ViewPager2.OnPageChangeCallback() {
-    //          @Override
-    //          public void onPageSelected(int position) {
-    //            super.onPageSelected(position);
-    //            activityMainBinding.tabLayout.getTabAt(position).select();
-    //          }
-    //        });
-    setUpDrawer();
+
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      setUpAdminDrawer();
+    } else {
+      setUpDrawer();
+    }
   }
 
-  private void setUpDrawer() {
+  private void generalDrawerSetUp() {
     drawerLayout = activityMainBinding.drawer;
     navigationView = activityMainBinding.navView;
     activityMainBinding.toolbarId.toolbarTitleId.setText("Home");
-    activityMainBinding.toolbarId.backIcon.setVisibility(View.GONE);
+    activityMainBinding.toolbarId.backIcon.setVisibility(View.VISIBLE);
 
     View headerView = navigationView.getHeaderView(0);
     TextView currentUserName = headerView.findViewById(R.id.displayName);
@@ -97,19 +93,20 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout.closeDrawer(GravityCompat.START);
 
     navigationView.bringToFront();
-
+    activityMainBinding.toolbarId.backIcon.setOnClickListener(
+        view -> {
+          finish();
+        });
     currentUserName.setText(userService.getCurrentUser().getDisplayName());
     currentUserEmail.setText(userService.getCurrentUser().getEmail());
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
     setSupportActionBar(activityMainBinding.toolbarId.menuIconId);
-    //    navigationView.bringToFront();
     ActionBarDrawerToggle drawerToggle =
         new ActionBarDrawerToggle(
             this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
-    //    drawerToggle.syncState();
-    navigationView.setCheckedItem(R.id.nav_home);
+
     activityMainBinding.toolbarId.menuIconId.setOnClickListener(
         view -> {
           if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -118,6 +115,13 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.openDrawer(GravityCompat.START);
           }
         });
+  }
+
+  private void setUpAdminDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.admin_menu);
+    navigationView.setCheckedItem(R.id.nav_home);
 
     navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {
@@ -131,6 +135,39 @@ public class MainActivity extends AppCompatActivity {
             } else if (menuItem.getItemId() == R.id.nav_chat) {
               Intent intent = new Intent(MainActivity.this, ViewRequestActivity.class);
               startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+              userService.signOut();
+              finish();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
+  }
+
+  private void setUpDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.main_menu);
+    navigationView.setCheckedItem(R.id.nav_home);
+
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              return false;
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              Intent intent = new Intent(MainActivity.this, AddSiteActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              Intent intent = new Intent(MainActivity.this, ViewRequestActivity.class);
+              startActivity(intent);
+
             } else if (menuItem.getItemId() == R.id.nav_noti) {
               Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
               startActivity(intent);

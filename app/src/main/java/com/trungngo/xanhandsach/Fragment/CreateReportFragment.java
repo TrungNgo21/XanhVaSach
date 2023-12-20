@@ -65,7 +65,8 @@ public class CreateReportFragment extends Fragment {
   }
 
   private void initialViewSetup() {
-    if (userService.getCurrentUser().getSiteId() == null) {
+    if (userService.getCurrentUser().getSiteId() == null
+        && !userService.getCurrentUser().getPermission().equals("super")) {
       fragmentReportBinding.reportContent.setVisibility(View.GONE);
       fragmentReportBinding.notHaveSite.setVisibility(View.VISIBLE);
       fragmentReportBinding.toCreateSite.setOnClickListener(
@@ -77,6 +78,7 @@ public class CreateReportFragment extends Fragment {
           });
 
     } else {
+
       fragmentReportBinding.reportContent.setVisibility(View.VISIBLE);
       fragmentReportBinding.notHaveSite.setVisibility(View.GONE);
     }
@@ -89,22 +91,24 @@ public class CreateReportFragment extends Fragment {
     } else {
       siteId = userService.getCurrentUser().getSiteId();
     }
-    siteService.getOneSite(
-        siteId,
-        new FirebaseCallback<Result<SiteDto>>() {
-          @Override
-          public void callbackListRes(List<Result<SiteDto>> listT) {}
+    if (siteId != null) {
+      siteService.getOneSite(
+          siteId,
+          new FirebaseCallback<Result<SiteDto>>() {
+            @Override
+            public void callbackListRes(List<Result<SiteDto>> listT) {}
 
-          @Override
-          public void callbackRes(Result<SiteDto> siteDtoResult) {
-            if (siteDtoResult instanceof Result.Success) {
-              SiteDto currentSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
-              siteDto = currentSite;
-            } else {
-              Log.d("Error getting site:", siteDtoResult.toString());
+            @Override
+            public void callbackRes(Result<SiteDto> siteDtoResult) {
+              if (siteDtoResult instanceof Result.Success) {
+                SiteDto currentSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
+                siteDto = currentSite;
+              } else {
+                Log.d("Error getting site:", siteDtoResult.toString());
+              }
             }
-          }
-        });
+          });
+    }
 
     fragmentReportBinding.selectedDate.setText(DateFormatter.toDateString(new Date()));
     report.setCreatedDate(new Date());
@@ -190,10 +194,11 @@ public class CreateReportFragment extends Fragment {
                             Notification notification =
                                 Notification.builder()
                                     .createdDate(new Date())
+                                    .isRequest(false)
                                     .title("Dear " + userDto.getDisplayName())
                                     .body(
                                         "Thanks for your effort our site has collected "
-                                            + getTotalWaste(siteDto)
+                                            + (getTotalWaste(siteDto) + report.getAmount())
                                             + " kg of waste")
                                     .build();
                             userService.sendNotification(
@@ -333,6 +338,9 @@ public class CreateReportFragment extends Fragment {
   }
 
   private Double getTotalWaste(SiteDto siteDto) {
+    if (siteDto.getReports().isEmpty()) {
+      return 0D;
+    }
     return siteDto.getReports().stream().map(Report::getAmount).reduce(0D, Double::sum);
   }
 

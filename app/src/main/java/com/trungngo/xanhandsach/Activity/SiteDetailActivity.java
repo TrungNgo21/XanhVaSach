@@ -98,12 +98,18 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     siteService = new SiteService(this);
     userService = new UserService(this, siteService);
     setUpGuestPerspective();
-    setUpDrawer();
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      setUpAdminDrawer();
+    } else {
+      setUpDrawer();
+    }
   }
 
   private void setUpGuestPerspective() {
     String siteId = getIntent().getStringExtra(Constant.KEY_SITE_ID);
-
+    if (siteId == null) {
+      siteId = siteService.getCacheSiteId();
+    }
     siteDetailBinding.progressBarHolder.setVisibility(View.VISIBLE);
     siteService.getOneSite(
         siteId,
@@ -115,11 +121,17 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
           public void callbackRes(Result<SiteDto> siteDtoResult) {
 
             if (siteDtoResult instanceof Result.Success) {
+              String targetSiteId = "";
               View chipView = siteDetailBinding.severityChip.getRoot();
               SiteDto getSite = ((Result.Success<SiteDto>) siteDtoResult).getData();
               siteDetail = getSite;
               setButtonListener();
-              if (userService.getCurrentUser().getSiteId().equals(getSite.getId())
+              if (userService.getCurrentUser().getSiteId() == null) {
+                targetSiteId = siteService.getCacheSiteId();
+              } else {
+                targetSiteId = userService.getCurrentUser().getSiteId();
+              }
+              if (targetSiteId.equals(getSite.getId())
                   || userService.getCurrentUser().getPermission().equals("super")) {
                 if (getSite.getVolunteers() == null || getSite.getVolunteers().isEmpty()) {
                   siteDetailBinding.volunteerSection.setVisibility(View.VISIBLE);
@@ -175,6 +187,9 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
 
   private void setButtonListener() {
     String siteId = getIntent().getStringExtra(Constant.KEY_SITE_ID);
+    if (siteId == null) {
+      siteId = siteService.getCacheSiteId();
+    }
     if (siteId.equals(userService.getCurrentUser().getSiteId())
         || userService.getCurrentUser().getPermission().equals("super")) {
       //      if (siteId == userService.getCurrentUser().getSiteId()) {
@@ -316,14 +331,11 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     marker = map.addMarker(new MarkerOptions().position(coordinates));
   }
 
-  private void setUpDrawer() {
+  private void generalDrawerSetUp() {
     drawerLayout = siteDetailBinding.drawer;
     navigationView = siteDetailBinding.navView;
-    siteDetailBinding.toolbarId.toolbarTitleId.setText("Site detail");
-    siteDetailBinding.toolbarId.backIcon.setOnClickListener(
-        view -> {
-          finish();
-        });
+    siteDetailBinding.toolbarId.toolbarTitleId.setText("Site Detail");
+    siteDetailBinding.toolbarId.backIcon.setVisibility(View.VISIBLE);
 
     View headerView = navigationView.getHeaderView(0);
     TextView currentUserName = headerView.findViewById(R.id.displayName);
@@ -332,18 +344,19 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
     drawerLayout.closeDrawer(GravityCompat.START);
 
     navigationView.bringToFront();
-
+    siteDetailBinding.toolbarId.backIcon.setOnClickListener(
+        view -> {
+          finish();
+        });
     currentUserName.setText(userService.getCurrentUser().getDisplayName());
     currentUserEmail.setText(userService.getCurrentUser().getEmail());
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
     setSupportActionBar(siteDetailBinding.toolbarId.menuIconId);
-    //    navigationView.bringToFront();
     ActionBarDrawerToggle drawerToggle =
         new ActionBarDrawerToggle(
             this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
-    //    drawerToggle.syncState();
     siteDetailBinding.toolbarId.menuIconId.setOnClickListener(
         view -> {
           if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -352,7 +365,12 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             drawerLayout.openDrawer(GravityCompat.START);
           }
         });
+  }
 
+  private void setUpAdminDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.admin_menu);
     navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {
           @Override
@@ -364,12 +382,44 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
             } else if (menuItem.getItemId() == R.id.nav_site) {
               Intent intent = new Intent(SiteDetailActivity.this, AddSiteActivity.class);
               finish();
-
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_chat) {
-
               Intent intent = new Intent(SiteDetailActivity.this, ViewRequestActivity.class);
+              finish();
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              Intent intent = new Intent(SiteDetailActivity.this, AboutUsActivity.class);
+              finish();
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(SiteDetailActivity.this, SignInActivity.class);
+              userService.signOut();
+              finish();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
+  }
 
+  private void setUpDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.main_menu);
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              Intent intent = new Intent(SiteDetailActivity.this, MainActivity.class);
+              finish();
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              Intent intent = new Intent(SiteDetailActivity.this, AddSiteActivity.class);
+              finish();
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              Intent intent = new Intent(SiteDetailActivity.this, ViewRequestActivity.class);
               finish();
               startActivity(intent);
             } else if (menuItem.getItemId() == R.id.nav_noti) {
@@ -384,7 +434,6 @@ public class SiteDetailActivity extends AppCompatActivity implements OnMapReadyC
               Intent intent = new Intent(SiteDetailActivity.this, SignInActivity.class);
               userService.signOut();
               finish();
-
               startActivity(intent);
             }
             return false;

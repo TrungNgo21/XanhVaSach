@@ -72,6 +72,8 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.SiteHolder> {
       final TextView severityName =
           (TextView) holder.severityChip.findViewById(R.id.severityNameId);
       severityName.setText("Dirty");
+      severityName.setTextColor(context.getResources().getColor(R.color.warning));
+
     } else if (selectedSite.getSeverity().equals("Quite Dirty")) {
       holder.severityChip.setBackgroundResource(R.drawable.success_chip);
       final TextView severityName =

@@ -36,10 +36,14 @@ public class AboutUsActivity extends AppCompatActivity {
 
     activityAboutUsBinding = ActivityAboutUsBinding.inflate(getLayoutInflater());
     setContentView(activityAboutUsBinding.getRoot());
-    setUpDrawer();
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      setUpAdminDrawer();
+    } else {
+      setUpDrawer();
+    }
   }
 
-  private void setUpDrawer() {
+  private void generalDrawerSetUp() {
     drawerLayout = activityAboutUsBinding.drawer;
     navigationView = activityAboutUsBinding.navView;
     activityAboutUsBinding.toolbarId.toolbarTitleId.setText("About us");
@@ -61,13 +65,10 @@ public class AboutUsActivity extends AppCompatActivity {
     ImageHandler.setImage(
         ImageHandler.stringImageToBitMap(userService.getCurrentUser().getImage()), currentUserImg);
     setSupportActionBar(activityAboutUsBinding.toolbarId.menuIconId);
-    //    navigationView.bringToFront();
     ActionBarDrawerToggle drawerToggle =
         new ActionBarDrawerToggle(
             this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(drawerToggle);
-    //    drawerToggle.syncState();
-    navigationView.setCheckedItem(R.id.nav_site);
     activityAboutUsBinding.toolbarId.menuIconId.setOnClickListener(
         view -> {
           if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -76,6 +77,45 @@ public class AboutUsActivity extends AppCompatActivity {
             drawerLayout.openDrawer(GravityCompat.START);
           }
         });
+  }
+
+  private void setUpAdminDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.admin_menu);
+    navigationView.setCheckedItem(R.id.nav_about_us);
+
+    navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+          @Override
+          public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+            if (menuItem.getItemId() == R.id.nav_home) {
+              Intent intent = new Intent(AboutUsActivity.this, MainActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_site) {
+              Intent intent = new Intent(AboutUsActivity.this, AddSiteActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_chat) {
+              Intent intent = new Intent(AboutUsActivity.this, ViewRequestActivity.class);
+              startActivity(intent);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+              return false;
+            } else if (menuItem.getItemId() == R.id.nav_logout) {
+              Intent intent = new Intent(AboutUsActivity.this, SignInActivity.class);
+              userService.signOut();
+              finish();
+              startActivity(intent);
+            }
+            return false;
+          }
+        });
+  }
+
+  private void setUpDrawer() {
+    generalDrawerSetUp();
+    navigationView.getMenu().clear();
+    navigationView.inflateMenu(R.menu.main_menu);
+    navigationView.setCheckedItem(R.id.nav_about_us);
 
     navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {

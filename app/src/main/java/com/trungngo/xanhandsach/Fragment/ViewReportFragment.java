@@ -4,6 +4,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,12 +69,13 @@ public class ViewReportFragment extends Fragment {
   }
 
   private void initialSetup() {
+    String targetId = "";
     setIsLoading(true);
     fragmentViewReportBinding.reportList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    if (userService.getCurrentUser().getSiteId() == null) {
+    if (userService.getCurrentUser().getSiteId() == null
+        && !userService.getCurrentUser().getPermission().equals("super")) {
       setIsLoading(false);
-
       fragmentViewReportBinding.reportList.setVisibility(View.GONE);
       fragmentViewReportBinding.notHaveReport.setVisibility(View.GONE);
       fragmentViewReportBinding.notHaveSite.setVisibility(View.VISIBLE);
@@ -82,9 +84,14 @@ public class ViewReportFragment extends Fragment {
       fragmentViewReportBinding.notHaveReport.setVisibility(View.GONE);
       fragmentViewReportBinding.notHaveSite.setVisibility(View.GONE);
     }
-    if (userService.getCurrentUser().getSiteId() != null) {
+    if (userService.getCurrentUser().getPermission().equals("super")) {
+      targetId = siteService.getCacheSiteId();
+    } else {
+      targetId = userService.getCurrentUser().getSiteId();
+    }
+    if (targetId != null) {
       siteService.getOneSite(
-          userService.getCurrentUser().getSiteId(),
+          targetId,
           new FirebaseCallback<Result<SiteDto>>() {
             @Override
             public void callbackListRes(List<Result<SiteDto>> listT) {}
@@ -106,6 +113,8 @@ public class ViewReportFragment extends Fragment {
                 }
                 reportAdapter.setData(reportList);
                 fragmentViewReportBinding.reportList.setAdapter(reportAdapter);
+              } else {
+                Log.d("Report err", "cannot get report");
               }
             }
           });

@@ -271,14 +271,14 @@ public class UserService {
     site.setVolunteers(new ArrayList<>(asList(volunteer)));
     siteService.updateSiteVolunteers(
         site.getId(),
-        site.getVolunteers(),
-        new FirebaseCallback<Result<List<UserDto>>>() {
+        volunteer,
+        new FirebaseCallback<Result<UserDto>>() {
           @Override
-          public void callbackListRes(List<Result<List<UserDto>>> listT) {}
+          public void callbackListRes(List<Result<UserDto>> listT) {}
 
           @Override
-          public void callbackRes(Result<List<UserDto>> listResult) {
-            if (listResult instanceof Result.Success) {
+          public void callbackRes(Result<UserDto> userDtoResult) {
+            if (userDtoResult instanceof Result.Success) {
               callback.callbackRes(new Result.Success<>(site));
             } else {
               callback.callbackRes(new Result.Error(new Exception("cannot apply")));
@@ -302,6 +302,7 @@ public class UserService {
                     + getCurrentUser().getDisplayName()
                     + ". I want to apply for your site. Please approve =>>")
             .createdDate(new Date())
+            .isRequest(true)
             .build();
     sendNotification(
         request,
@@ -323,6 +324,7 @@ public class UserService {
         com.trungngo.xanhandsach.Model.Request.builder()
             .sentDate(new Date())
             .volunteers(getCurrentUser())
+            .toSite(site)
             .build();
     siteService.updateRequest(
         site.getId(),

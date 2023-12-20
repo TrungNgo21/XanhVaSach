@@ -49,10 +49,12 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.squareup.picasso.Picasso;
+import com.trungngo.xanhandsach.Activity.SiteDetailActivity;
 import com.trungngo.xanhandsach.Adapter.ImageAdapter;
 import com.trungngo.xanhandsach.Callback.FirebaseCallback;
 import com.trungngo.xanhandsach.Dto.SiteDto;
 import com.trungngo.xanhandsach.Dto.UserDto;
+import com.trungngo.xanhandsach.Model.Notification;
 import com.trungngo.xanhandsach.Model.Site;
 import com.trungngo.xanhandsach.R;
 import com.trungngo.xanhandsach.Service.ImageService;
@@ -96,12 +98,15 @@ public class CreateSiteFragment extends Fragment
 
   private SiteService siteService;
 
+  private UserDto currentUser;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     fragmentCreateSiteBinding = fragmentCreateSiteBinding.inflate(getLayoutInflater());
     imageService = new ImageService();
     userService = new UserService(requireContext());
+    currentUser = userService.getCurrentUser();
     siteService = new SiteService(requireContext());
     imageAdapter = new ImageAdapter(requireContext(), this, this);
     imageAdapter.setData(uriList);
@@ -118,7 +123,7 @@ public class CreateSiteFragment extends Fragment
   }
 
   private void initialSetup() {
-    //    fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
+    fragmentCreateSiteBinding.noImageSelected.setVisibility(View.VISIBLE);
     setErrorMess(fragmentCreateSiteBinding.siteDesErr, false);
     setErrorMess(fragmentCreateSiteBinding.siteNameErr, false);
     setErrorMess(fragmentCreateSiteBinding.maxVolunErr, false);
@@ -183,10 +188,10 @@ public class CreateSiteFragment extends Fragment
   @Override
   public void onResume() {
     super.onResume();
-    if (userService.getCurrentUser().getSiteId() != null
-        || userService.getCurrentUser().getPermission().equals("super")) {
-      ownerSetUp();
-    }
+    //    if (userService.getCurrentUser().getSiteId() != null
+    //        || userService.getCurrentUser().getPermission().equals("super")) {
+    //      ownerSetUp();
+    //    }
   }
 
   private void setUpButtonPressed() {
@@ -290,10 +295,22 @@ public class CreateSiteFragment extends Fragment
                     currentSite.getImageUrl().stream().map(Uri::parse).collect(Collectors.toList());
                 if (!uriList.equals(currentSiteImg)) {
                   if (uriList.isEmpty()) {
+                    sendUpdateNotification(
+                        Notification.builder()
+                            .title("Dear all,")
+                            .isSiteUpdated(true)
+                            .createdDate(new Date())
+                            .siteId(currentSite.getId())
+                            .body("Our site has some updates. Please notice!")
+                            .build());
                     Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), SiteDetailActivity.class);
+                    intent.putExtra(Constant.KEY_SITE_ID, currentSite.getId());
+                    startActivity(intent);
                     setEnabledUi(true);
                     setIsLoading(false);
                   } else {
+
                     imageService.uploadImages(
                         uriList,
                         createdSite.getId(),
@@ -316,10 +333,21 @@ public class CreateSiteFragment extends Fragment
                                     @Override
                                     public void callbackRes(Result<Site> siteResult) {
                                       if (siteResult instanceof Result.Success) {
+                                        sendUpdateNotification(
+                                            Notification.builder()
+                                                .title("Dear all,")
+                                                .isSiteUpdated(true)
+                                                .createdDate(new Date())
+                                                .siteId(currentSite.getId())
+                                                .body("Our site has some updates. Please notice!")
+                                                .build());
                                         Toast.makeText(
                                                 requireContext(), "Successful!", Toast.LENGTH_SHORT)
                                             .show();
-
+                                        Intent intent =
+                                            new Intent(requireContext(), SiteDetailActivity.class);
+                                        intent.putExtra(Constant.KEY_SITE_ID, currentSite.getId());
+                                        startActivity(intent);
                                         setEnabledUi(true);
                                         setIsLoading(false);
                                       } else {
@@ -331,11 +359,24 @@ public class CreateSiteFragment extends Fragment
                                       }
                                     }
                                   });
+                            } else {
+                              Log.d("error imgs", listResult.toString());
                             }
                           }
                         });
                   }
                 } else {
+                  sendUpdateNotification(
+                      Notification.builder()
+                          .title("Dear all,")
+                          .isSiteUpdated(true)
+                          .createdDate(new Date())
+                          .siteId(currentSite.getId())
+                          .body("Our site has some updates. Please notice!")
+                          .build());
+                  Intent intent = new Intent(requireContext(), SiteDetailActivity.class);
+                  intent.putExtra(Constant.KEY_SITE_ID, currentSite.getId());
+                  startActivity(intent);
                   Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
                   setEnabledUi(true);
                   setIsLoading(false);
@@ -358,11 +399,13 @@ public class CreateSiteFragment extends Fragment
             public void callbackRes(Result<Site> siteResult) {
               if (siteResult instanceof Result.Success) {
                 Site site = ((Result.Success<Site>) siteResult).getData();
+                currentUser.setSiteId(site.getId());
+                userService.setCurrentUser(currentUser);
                 if (uriList.isEmpty()) {
                   Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show();
-                  UserDto currentUser = userService.getCurrentUser();
-                  currentUser.setSiteId(createdSite.getId());
-                  userService.setCurrentUser(currentUser);
+                  Intent intent = new Intent(requireContext(), SiteDetailActivity.class);
+                  intent.putExtra(Constant.KEY_SITE_ID, site.getId());
+                  startActivity(intent);
                   setEnabledUi(true);
                   setIsLoading(false);
                 }
@@ -390,6 +433,10 @@ public class CreateSiteFragment extends Fragment
                                     Toast.makeText(
                                             requireContext(), "Successful!", Toast.LENGTH_SHORT)
                                         .show();
+                                    Intent intent =
+                                        new Intent(requireContext(), SiteDetailActivity.class);
+                                    intent.putExtra(Constant.KEY_SITE_ID, site.getId());
+                                    startActivity(intent);
                                     setEnabledUi(true);
                                     setIsLoading(false);
                                   } else {
@@ -427,7 +474,6 @@ public class CreateSiteFragment extends Fragment
                   for (int i = 0; i < numImages; i++) {
                     if (uriList.size() < 8) {
                       uriList.add(data.getClipData().getItemAt(i).getUri());
-
                     } else {
                       Toast.makeText(
                               requireContext(),
@@ -672,5 +718,29 @@ public class CreateSiteFragment extends Fragment
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
     return fragmentCreateSiteBinding.getRoot();
+  }
+
+  private void sendUpdateNotification(Notification updateNoti) {
+    if (currentSite.getVolunteers().isEmpty()) {
+      return;
+    }
+    for (UserDto volunteer : currentSite.getVolunteers()) {
+      userService.sendNotification(
+          updateNoti,
+          volunteer.getId(),
+          new FirebaseCallback<Result<Notification>>() {
+            @Override
+            public void callbackListRes(List<Result<Notification>> listT) {}
+
+            @Override
+            public void callbackRes(Result<Notification> notificationResult) {
+              if (notificationResult instanceof Result.Success) {
+
+              } else {
+
+              }
+            }
+          });
+    }
   }
 }

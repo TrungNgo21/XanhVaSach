@@ -30,7 +30,7 @@ public class Site {
   private String address;
   private String description;
   private boolean isDeleted;
-  private List<Report> reports;
+  @Builder.Default private List<Report> reports = new ArrayList<>();
   @Builder.Default private List<Request> requests = new ArrayList<>();
   @Builder.Default private List<String> imageUrl = new ArrayList<>();
   @Builder.Default private List<UserDto> volunteers = new ArrayList<>();

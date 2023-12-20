@@ -7,6 +7,7 @@
     android:layout_marginVertical="@dimen/_4sdp"
     android:paddingHorizontal="@dimen/_4sdp"
     android:paddingVertical="@dimen/_2sdp"
+    android:layout_marginHorizontal="@dimen/_2sdp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
@@ -69,6 +70,7 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:visibility="gone"
             android:id="@+id/toRequestBtn"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/_30sdp"
